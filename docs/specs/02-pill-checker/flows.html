@@ -163,6 +163,7 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
 
 /* Theme: caregiver screens (app, dashboard) are dark by default, Grete's phone is light. Both can be switched in settings. */
 [data-theme="dark"] { --paper: #000000; --ink: #ffffff; --ink-soft: #9aa5a0; --mist: #1d2120; --hair: rgb(255 255 255 / 0.16); color: var(--ink); }
+[data-theme="dark"] .orb { --ink: #000000; --paper: #ffffff; }
 [data-theme="dark"] :is(.note, .phone.alarm, .phone.warn, .ev.done, .ev.rem, .ev.moved, .ev.missed, .big.yes, .big.sos, .who.g, .bubble:not(.in), .pick > span.on .who) { --paper: #ffffff; --ink: #000000; --ink-soft: #5c6662; --mist: #edf1ef; --hair: rgb(0 0 0 / 0.12); color: #000000; }
 [data-theme="dark"] > p { color: var(--ink-soft); }
 [data-theme="dark"] .phone { border-color: #000000; }
