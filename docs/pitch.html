@@ -181,6 +181,7 @@ a { color: inherit; }
 .reveal #demo-cap { position: absolute; left: 50%; bottom: 96px; width: 1500px; translate: -50% 0; aspect-ratio: 1200 / 60; opacity: 0; transition: opacity 1s var(--ease) 1.6s; }
 .reveal.on #demo-cap { opacity: 1; }
 .reveal.outro #demo-cap { opacity: 0; transition-delay: 0s; }
+.reveal.outro #demo-full { z-index: 2; }
 .reveal video { position: absolute; width: 2px; height: 2px; opacity: 0; pointer-events: none; }
 .reveal .ctrl { position: absolute; left: 50%; bottom: 40px; translate: -50% 0; display: flex; align-items: center; gap: 18px; color: #9aa5a0; font-size: 18px; font-weight: 600; z-index: 3; opacity: 0.35; transition: opacity 0.3s; }
 .reveal .ctrl:hover { opacity: 1; }
@@ -501,12 +502,38 @@ a { color: inherit; }
   const full = document.getElementById("demo-full").getContext("2d");
   const PHONE = [936, 133, 234, 476], CAP = [40, 652, 1200, 60], OUTRO = 159;
   const fmt = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+  // Fixes to the generated walkthrough. In the app Jonas asks Claudia, and Claudia asks Anna; Jonas never asks Anna himself.
+  // The original voices for 0:41-0:52 are muted and replaced by these captions.
+  const MUTE = [41.0, 52.4];
+  const SAY = [
+    [41.0, 46.0, "Jonas", "Hey Claudia, my shift has moved. Can someone else take Mum to the dentist on Friday?"],
+    [46.0, 49.6, "Claudia", "Anna, you're free on Friday. Will you take Grete to the dentist at half past ten?"],
+    [49.6, 52.4, "Anna", "Yes, I'll take it."],
+  ];
+  const WIDE = [[52.3, 56.9]]; // calendar shown full width, no phone in the frame
+  const inR = (t, r) => t >= r[0] && t < r[1];
+  const said = (who, text) => {
+    cap.fillStyle = "#000905"; cap.fillRect(0, 0, 1800, 90);
+    cap.font = "700 30px 'Atkinson Hyperlegible Next', system-ui, sans-serif";
+    const gap = 24, w1 = cap.measureText(who).width;
+    cap.font = "600 30px 'Atkinson Hyperlegible Next', system-ui, sans-serif";
+    const w2 = cap.measureText(text).width, x = (1800 - w1 - gap - w2) / 2;
+    cap.textBaseline = "middle";
+    cap.font = "700 30px 'Atkinson Hyperlegible Next', system-ui, sans-serif"; cap.fillStyle = "#d8f45c"; cap.fillText(who, x, 30);
+    cap.font = "600 30px 'Atkinson Hyperlegible Next', system-ui, sans-serif"; cap.fillStyle = "#ffffff"; cap.fillText(text, x + w1 + gap, 30);
+  };
   const draw = () => {
     if (v.readyState >= 2) {
-      const out = v.currentTime >= OUTRO;
+      const t = v.currentTime;
+      v.volume = inR(t, MUTE) ? 0 : 1;
+      const out = t >= OUTRO || WIDE.some((r) => inR(t, r));
       reveal.classList.toggle("outro", out);
       if (out) full.drawImage(v, 0, 0, 1280, 720);
-      else { ph.drawImage(v, ...PHONE, 0, 0, 468, 952); cap.drawImage(v, ...CAP, 0, 0, 1800, 90); }
+      else {
+        ph.drawImage(v, ...PHONE, 0, 0, 468, 952);
+        const line = SAY.find((r) => inR(t, r));
+        if (line) said(line[2], line[3]); else cap.drawImage(v, ...CAP, 0, 0, 1800, 90);
+      }
       document.getElementById("demo-prog").style.width = `${(v.currentTime / (v.duration || 1)) * 100}%`;
       document.getElementById("demo-time").textContent = `${fmt(v.currentTime)} / ${fmt(v.duration || 0)}`;
     }
