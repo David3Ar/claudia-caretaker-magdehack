@@ -1,6 +1,6 @@
 # Feature 3 — Live Location + Emergency Alert
 
-> Source: `todo/IMG_2837`. Priority: **M** (Primary #6 + #9; core cluster incl. messaging).
+> Source: whiteboard photo IMG_2837 (not in repo). Priority: **M** (Primary #6 + #9; core cluster incl. messaging).
 
 ## Scope
 

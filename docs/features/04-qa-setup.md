@@ -1,6 +1,6 @@
 # Feature 4 — QA / Setup
 
-> Source: `todo/IMG_2838`. Priority: **M** (Primary #7 Web QA + #8 Setup, core cluster).
+> Source: whiteboard photo IMG_2838 (not in repo). Priority: **M** (Primary #7 Web QA + #8 Setup, core cluster).
 > Who: **C and G** both use it.
 
 ## Scope

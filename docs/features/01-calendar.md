@@ -1,6 +1,6 @@
 # Feature 1 — Calendar / Scheduling
 
-> Source: `todo/IMG_2834`, `IMG_2835`. Priority: **M** (Primary #4, core ✔).
+> Source: whiteboard photos IMG_2834, IMG_2835 (not in repo). Priority: **M** (Primary #4, core ✔).
 > `C` = caregiver · `G` = senior
 
 ## Scope

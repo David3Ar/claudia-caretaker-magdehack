@@ -1,6 +1,6 @@
 # Feature 2 — Pill Checker
 
-> Source: `todo/IMG_2836`. Priority: **M** (Primary #3, core ✔).
+> Source: whiteboard photo IMG_2836 (not in repo). Priority: **M** (Primary #3, core ✔).
 
 ## Scope
 

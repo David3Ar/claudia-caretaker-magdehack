@@ -1,6 +1,6 @@
 # User Story Map — Voice Agent for Seniors
 
-> Source: whiteboards `todo/IMG_2833`, `IMG_2840`, `IMG_2841`.
+> Source: whiteboard photos IMG_2833, IMG_2840, IMG_2841 (not in repo).
 > Main idea (board): *"To help regulate mental health of old people (Voice Agent)"*.
 
 **Legend:** `M` Must · `S` Should · `C` Could · `W` Won't · `?` = open / to be discussed
