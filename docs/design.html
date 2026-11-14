@@ -269,6 +269,27 @@ button.orb { border: 0; background: none; padding: 0; }
 .foot-grid p, .foot-grid li { color: rgb(255 255 255 / 0.72); }
 .foot a { color: var(--lime); }
 
+/* Themes: the caregiver app and the web dashboard are dark by default, the senior app is light. Both can be switched in settings. */
+[data-theme="dark"] { --paper: #000000; --ink: #ffffff; --ink-soft: #9aa5a0; --mist: #1d2120; --hair: rgb(255 255 255 / 0.16); color: var(--ink); background: var(--paper); }
+[data-theme="dark"] :is(.ev.open, .tag.alert, .big.yes, .big.sos, .who.g, .pick span.on .who, .orb) { --paper: #ffffff; --ink: #000000; --ink-soft: #5c6662; --mist: #edf1ef; --hair: rgb(0 0 0 / 0.12); }
+[data-theme="dark"] :is(.ev.open, .tag.alert, .big.yes, .big.sos) { color: #000000; }
+.phone[data-theme="dark"] { border-color: #000000; }
+.phone[data-theme="dark"]::before { background: #262626; }
+.calendar[data-theme="dark"], .dash[data-theme="dark"] { background: var(--mist); }
+[data-theme="dark"] .day.now { background: #2b302e; }
+[data-theme="dark"] .day.now h5, [data-theme="dark"] .day.now h5 b { color: #ffffff; }
+[data-theme="dark"] .day.now .ev:not(.open) { background: #000000; color: #ffffff; }
+[data-theme="dark"] .map svg g { stroke: #333a37; }
+[data-theme="dark"] .map svg path[stroke="#000"] { stroke: #ffffff; }
+[data-theme="dark"] .map svg circle[fill="#000"] { fill: #ffffff; }
+[data-theme="dark"] .map svg circle[fill="#fff"] { fill: #000000; stroke: #ffffff; }
+[data-theme="dark"] .map .here { background: #000000; color: #ffffff; box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25); }
+[data-theme="dark"] .switch[aria-checked="false"] { background: #3a403e; }
+.themes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+.themes div { border-radius: var(--r-m); padding: 1.5rem; min-height: 9rem; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; box-shadow: inset 0 0 0 1px var(--hair); }
+.themes b { font-size: 1.5rem; letter-spacing: -0.02em; }
+.themes span { color: var(--ink-soft); }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -282,6 +303,7 @@ button.orb { border: 0; background: none; padding: 0; }
   .cards, .prefs { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 40rem) {
+  .themes { grid-template-columns: 1fr; }
   .top nav { justify-content: flex-start; }
   .rules li, .tscale > div { grid-template-columns: 1fr; gap: 0.5rem; }
   .swatches li { grid-template-columns: 3.5rem 1fr; gap: 0.125rem 1rem; }
@@ -354,7 +376,7 @@ button.orb { border: 0; background: none; padding: 0; }
           <li><h3>Say it, don't find it</h3><p>Anything the app can do, you can ask for out loud. A screen shows what was said and what happens next, never a menu to dig through.</p></li>
           <li><h3>Buttons for what can't wait</h3><p>Calling family and calling for help are always one large press away, on every senior screen, in the same place.</p></li>
           <li><h3>Everyday words only</h3><p>Tablets, not medication adherence. "Jonas is at work", not a location status. No settings page for the senior at all.</p></li>
-          <li><h3>Caregivers get the detail</h3><p>The family can type, tap and plan. Their app and the dashboard add forms and history, in the same calm look.</p></li>
+          <li><h3>Caregivers get the detail</h3><p>The family can type, tap and plan. Their app and the dashboard add forms and history, in the same calm look, dark by default.</p></li>
         </ul>
       </div>
     </div>
@@ -378,6 +400,14 @@ button.orb { border: 0; background: none; padding: 0; }
             <li><span class="chip" style="background:var(--amber)"></span><span class="tok">Amber</span><span class="soft num">#ffb23e</span><span>Late, unanswered, needs someone</span></li>
             <li><span class="chip" style="background:var(--coral)"></span><span class="tok">Coral</span><span class="soft num">#ff5a3c</span><span>Emergency, and nothing else</span></li>
           </ul>
+        </div>
+        <div class="sub">
+          <h3>Two themes</h3>
+          <p>Same six colours, two defaults. Grete's screens stay light and calm; the family's screens are dark, for checking in at any hour. Everyone can switch in settings.</p>
+          <div class="themes">
+            <div><b>Light</b><span>Default for the senior app</span></div>
+            <div data-theme="dark"><b>Dark</b><span>Default for the caregiver app and the web dashboard</span></div>
+          </div>
         </div>
         <div class="sub">
           <h3>One scale, used everywhere</h3>
@@ -522,7 +552,7 @@ button.orb { border: 0; background: none; padding: 0; }
     <div class="wrap">
       <div class="sec-head">
         <h2 id="ca-title">Caregiver app</h2>
-        <p>Jonas opens it to stop worrying. The first line answers the only question he has.</p>
+        <p>Jonas opens it to stop worrying. The first line answers the only question he has. Dark by default.</p>
       </div>
       <div class="sec-body">
         <div class="sub">
@@ -530,7 +560,7 @@ button.orb { border: 0; background: none; padding: 0; }
           <p>Voice still sits in the middle of the bar. Around it, the family can tap and type.</p>
           <div class="phones three">
             <figure>
-              <div class="phone">
+              <div class="phone" data-theme="dark">
                 <p class="p-hello">Grete is doing fine</p>
                 <span class="tag ok" style="align-self:start">At home since 11:20</span>
                 <ul class="rows p-small" style="font-size:0.9375rem">
@@ -547,7 +577,7 @@ button.orb { border: 0; background: none; padding: 0; }
               <figcaption><b>Today</b>Status first, then the day in order. An open task shows a dashed circle.</figcaption>
             </figure>
             <figure>
-              <div class="phone">
+              <div class="phone" data-theme="dark">
                 <p class="p-hello">New appointment</p>
                 <div class="field">What<b>Hairdresser</b></div>
                 <div class="field">When<b>Thursday, 10:00</b></div>
@@ -590,7 +620,7 @@ button.orb { border: 0; background: none; padding: 0; }
         <div class="sub">
           <h3>The week, for the family</h3>
           <p>An appointment nobody has taken turns amber and becomes the question at the top. Once answered, the question disappears.</p>
-          <div class="calendar">
+          <div class="calendar" data-theme="dark">
             <div class="ask">
               <h4>Who takes Grete to the hairdresser?</h4>
               <p>Thursday at 10:00. Jonas is free, Anna is at work until 13:00.</p>
@@ -670,8 +700,8 @@ button.orb { border: 0; background: none; padding: 0; }
       <div class="sec-body">
         <div class="sub">
           <h3>Web dashboard for the family</h3>
-          <p>White cards on mist. Large numbers answer first, the detail sits below.</p>
-          <div class="dash">
+          <p>Black cards on dark grey, dark by default like the caregiver app. Large numbers answer first, the detail sits below.</p>
+          <div class="dash" data-theme="dark">
             <div class="rail" aria-hidden="true">
               <span class="on"><svg class="i"><use href="#i-home"/></svg></span>
               <span><svg class="i"><use href="#i-cal"/></svg></span>
