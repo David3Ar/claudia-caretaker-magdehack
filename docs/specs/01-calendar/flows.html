@@ -166,6 +166,26 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
 .drop span { padding: 0.4375rem 0.75rem; font-weight: 500; }
 .drop .sel { background: var(--ink); color: var(--paper); }
 
+/* Theme: caregiver screens (app, dashboard) are dark by default, Grete's phone is light. Both can be switched in settings. */
+[data-theme="dark"] { --paper: #000000; --ink: #ffffff; --ink-soft: #9aa5a0; --mist: #1d2120; --hair: rgb(255 255 255 / 0.16); color: var(--ink); }
+[data-theme="dark"] :is(.note, .phone.alarm, .phone.warn, .ev.done, .ev.rem, .ev.moved, .ev.missed, .big.yes, .big.sos, .who.g, .bubble:not(.in), .pick > span.on .who) { --paper: #ffffff; --ink: #000000; --ink-soft: #5c6662; --mist: #edf1ef; --hair: rgb(0 0 0 / 0.12); color: #000000; }
+[data-theme="dark"] > p { color: var(--ink-soft); }
+[data-theme="dark"] .phone { border-color: #000000; }
+[data-theme="dark"] .phone::before { background: #262626; }
+[data-theme="dark"] .phone.dark { background: #000000; color: #ffffff; }
+[data-theme="dark"] .phone.alarm::before, [data-theme="dark"] .phone.warn::before { background: #000000; }
+[data-theme="dark"] .map svg g { stroke: #333a37; }
+[data-theme="dark"] .map svg path[stroke="#000"] { stroke: #ffffff; }
+[data-theme="dark"] .map svg circle[fill="#000"] { fill: #ffffff; }
+[data-theme="dark"] .map .here { background: #000000; color: #ffffff; box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25); }
+[data-theme="dark"] .push { box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25); }
+[data-theme="dark"] .ev.new { box-shadow: 0 0 0 2px #000000, 0 0 0 4px #ffffff; }
+[data-theme="dark"] .day.now { background: #2b302e; }
+[data-theme="dark"] .day.now h5, [data-theme="dark"] .day.now h5 b { color: #ffffff; }
+[data-theme="dark"] .day.now .ev:not(.done):not(.moved):not(.missed):not(.rem) { background: #000000; }
+[data-theme="dark"] .check { background-color: #2b302e; }
+[data-theme="dark"] .switch:not(.on) { background: #3a403e; }
+
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } .orb[data-state="speaking"] .bars i:nth-child(odd) { transform: scaleY(0.9); } .orb[data-state="speaking"] .bars i:nth-child(even) { transform: scaleY(0.5); } }
 @media (max-width: 60rem) {
   .stage { grid-template-columns: minmax(0, 1fr); }
@@ -203,7 +223,7 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
         <div class="dots" id="dots"></div>
         <button type="button" class="big mid" id="next" style="width:auto;padding:0 1.5rem">Next</button>
       </div>
-      <p class="hint">Arrow keys work too. People, dates and places are made up.</p>
+      <p class="hint">Caregiver screens are dark and Grete's are light by default; both can be changed in settings. Arrow keys work too. People, dates and places are made up.</p>
     </section>
     <section class="device">
       <p id="dev-label"></p>
@@ -342,6 +362,7 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
     $("step-why").textContent = s.why;
     $("example").hidden = !s.ex;
     $("dev-label").textContent = s.dev;
+    document.querySelector(".device").dataset.theme = s.dev === GP ? "light" : "dark";
     $("dev").innerHTML = s.html;
     $("dots").innerHTML = flow.steps.map((_, k) => `<button type="button" data-k="${k}"${k === i ? ' aria-current="step"' : ""} aria-label="Step ${k + 1}">${k + 1}</button>`).join("");
     $("prev").disabled = f === 0 && i === 0;
