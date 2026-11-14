@@ -30,6 +30,7 @@ Board title: *"To help regulate mental health of old people (Voice Agent)"*. Cha
 | Path | Content |
 |---|---|
 | [`AGENTS.md`](AGENTS.md) | Agent instructions (this file) |
+| [`.claude/skills/`](.claude/skills/) | Project skills: `better-diagrams`, `ponytail`, `impeccable`, `ui-ux-pro-max` |
 | [`docs/project.md`](docs/project.md) | Pitch brief |
 | [`docs/user-story-map.md`](docs/user-story-map.md) | User story map + MoSCoW |
 | [`docs/features/01-calendar.md`](docs/features/01-calendar.md) | Feature 1 — Calendar / Scheduling |
