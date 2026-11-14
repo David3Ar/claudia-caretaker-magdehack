@@ -163,13 +163,30 @@ a { color: inherit; }
 .ph p { font-size: 20px; font-weight: 600; color: var(--ink-soft); }
 .ph .who { width: 34px; height: 34px; font-size: 15px; vertical-align: middle; margin-right: 8px; }
 
-/* 10 Demo */
-.demo { flex: 1; margin-top: 40px; border-radius: var(--r-l); overflow: hidden; position: relative; background: #1d2120; display: grid; place-items: center; }
-.demo video { width: 100%; height: 100%; object-fit: cover; display: block; }
-.demo .ph-empty { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 36px; text-align: center; color: #fff; }
-.demo .ph-empty p { font-size: 28px; color: #9aa5a0; }
-.demo .ph-empty code { font-size: 24px; color: var(--lime); }
-.demo.has-video .ph-empty { display: none; }
+/* 10 Demo: the phone is cropped live from the walkthrough video and shown alone, product-reveal style */
+.slide.reveal { background: #000905; padding: 0; }
+.reveal .top { position: absolute; left: 104px; right: 104px; top: 72px; z-index: 3; }
+.reveal .glow { position: absolute; left: 50%; top: 47%; width: 1100px; height: 1100px; translate: -50% -50%; border-radius: 50%; background: conic-gradient(var(--lime), var(--amber), var(--coral), var(--amber), var(--lime)); filter: blur(160px); opacity: 0; animation: spin 24s linear infinite; transition: opacity 2.4s var(--ease) 0.4s; }
+.reveal.on .glow { opacity: 0.22; }
+.reveal .glow::after { content: ""; position: absolute; inset: 22%; border-radius: 50%; background: #000905; filter: blur(60px); }
+.reveal .hero { position: absolute; inset: 0; display: grid; place-items: center; perspective: 2400px; }
+.reveal #demo-phone { display: block; height: 860px; width: auto; aspect-ratio: 234 / 476; border-radius: 13% / 6.4%;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08), 0 60px 140px rgb(0 0 0 / 0.7), 0 0 120px rgb(198 244 50 / 0.12);
+  opacity: 0; transform: translateY(160px) scale(0.86) rotateX(22deg); filter: blur(12px);
+  transition: opacity 1.4s var(--ease) 0.5s, transform 2.2s var(--ease) 0.5s, filter 1.4s var(--ease) 0.5s; }
+.reveal.on #demo-phone { opacity: 1; transform: none; filter: none; }
+.reveal.outro #demo-phone { opacity: 0; transform: scale(0.94); filter: blur(10px); transition-delay: 0s; }
+.reveal #demo-full { position: absolute; left: 50%; top: 50%; width: 1600px; translate: -50% -50%; opacity: 0; transition: opacity 1.2s var(--ease); pointer-events: none; }
+.reveal.outro #demo-full { opacity: 1; }
+.reveal #demo-cap { position: absolute; left: 50%; bottom: 96px; width: 1500px; translate: -50% 0; aspect-ratio: 1200 / 60; opacity: 0; transition: opacity 1s var(--ease) 1.6s; }
+.reveal.on #demo-cap { opacity: 1; }
+.reveal.outro #demo-cap { opacity: 0; transition-delay: 0s; }
+.reveal video { position: absolute; width: 2px; height: 2px; opacity: 0; pointer-events: none; }
+.reveal .ctrl { position: absolute; left: 50%; bottom: 40px; translate: -50% 0; display: flex; align-items: center; gap: 18px; color: #9aa5a0; font-size: 18px; font-weight: 600; z-index: 3; opacity: 0.35; transition: opacity 0.3s; }
+.reveal .ctrl:hover { opacity: 1; }
+.reveal .ctrl button { width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgb(255 255 255 / 0.12); color: #fff; font-size: 16px; cursor: pointer; }
+.reveal .track { width: 360px; height: 4px; border-radius: 2px; background: rgb(255 255 255 / 0.15); overflow: hidden; cursor: pointer; }
+.reveal .track i { display: block; height: 100%; width: 0; background: var(--lime); }
 
 /* 11 Future */
 .future { display: grid; grid-template-columns: 1fr 1.6fr; gap: 40px; margin-top: auto; }
@@ -391,17 +408,15 @@ a { color: inherit; }
     </div>
   </section>
 
-  <!-- 10 Demo video -->
-  <section class="slide dark" data-title="Demo">
-    <div class="top in" style="--i:0"><span class="kicker">Demo</span><span class="soft">Claudia, live with ElevenLabs</span></div>
-    <div class="demo in" style="--i:1" id="demo">
-      <video id="demo-video" src="media/demo.mp4" controls playsinline preload="metadata"></video>
-      <div class="ph-empty">
-        <div class="orb" data-state="listening" style="--s:260px"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
-        <p>Demo video goes here</p>
-        <code>docs/media/demo.mp4</code>
-      </div>
-    </div>
+  <!-- 10 Demo video: phone only, centred -->
+  <section class="slide dark reveal" data-title="Demo">
+    <div class="top in" style="--i:0"><span class="kicker">Demo</span><span class="soft">Claudia, in Grete's and Jonas's hands</span></div>
+    <div class="glow" aria-hidden="true"></div>
+    <div class="hero"><canvas id="demo-phone" width="468" height="952" aria-label="Claudia app walkthrough, phone screen"></canvas></div>
+    <canvas id="demo-full" width="1280" height="720" aria-hidden="true"></canvas>
+    <canvas id="demo-cap" width="1800" height="90" aria-hidden="true"></canvas>
+    <video id="demo-video" src="../pitch/output/claudia-app-demo.mp4" playsinline preload="auto"></video>
+    <div class="ctrl"><button type="button" id="demo-play" aria-label="Play or pause">❚❚</button><span class="track" id="demo-track"><i id="demo-prog"></i></span><span class="num" id="demo-time">0:00</span></div>
   </section>
 
   <!-- 11 Future updates -->
@@ -444,6 +459,15 @@ a { color: inherit; }
     const s = Math.min(innerWidth / 1920, innerHeight / 1080);
     deck.style.transform = `scale(${s}) translate(-50%, -50%)`;
   };
+  // Always try to play with sound. If the browser blocks audible autoplay, play muted and unmute on the next key press or click.
+  const playWithSound = () => {
+    const v = document.getElementById("demo-video");
+    v.muted = false; v.volume = 1;
+    v.play().catch(() => { v.muted = true; v.play().catch(() => {}); });
+  };
+  const unmute = () => { const v = document.getElementById("demo-video"); if (v.muted && !v.paused) { v.muted = false; v.volume = 1; } };
+  addEventListener("pointerdown", unmute, true);
+  addEventListener("keydown", unmute, true);
   const show = (k, dir = 1) => {
     k = Math.max(0, Math.min(slides.length - 1, k));
     slides.forEach((el, j) => { el.classList.toggle("on", j === k); el.classList.toggle("back", dir < 0); });
@@ -452,7 +476,7 @@ a { color: inherit; }
     document.getElementById("count").textContent = `${k + 1} / ${slides.length} · ${slides[k].dataset.title}`;
     history.replaceState(null, "", `#${k + 1}`);
     const v = document.getElementById("demo-video");
-    if (slides[k].contains(v)) { v.play?.().catch(() => {}); } else { v.pause?.(); }
+    if (slides[k].contains(v)) { playWithSound(); } else { v.pause?.(); }
   };
   const next = () => show(n + 1, 1), prev = () => show(n - 1, -1);
   addEventListener("keydown", (e) => {
@@ -465,12 +489,35 @@ a { color: inherit; }
   document.getElementById("next").onclick = next;
   document.getElementById("prev").onclick = prev;
   document.getElementById("full").onclick = () => document.documentElement.requestFullscreen?.();
-  deck.addEventListener("click", (e) => { if (!e.target.closest("a, video, button")) next(); });
+  deck.addEventListener("click", (e) => { if (!e.target.closest("a, video, button, .ctrl, #demo-phone")) next(); });
   let tx = null;
   addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; }, { passive: true });
   addEventListener("touchend", (e) => { if (tx == null) return; const d = e.changedTouches[0].clientX - tx; if (Math.abs(d) > 50) (d < 0 ? next : prev)(); tx = null; });
+  // Demo: crop the phone and the caption line out of the walkthrough video, frame by frame
   const v = document.getElementById("demo-video");
-  v.addEventListener("loadeddata", () => document.getElementById("demo").classList.add("has-video"));
+  const reveal = v.closest(".slide");
+  const ph = document.getElementById("demo-phone").getContext("2d");
+  const cap = document.getElementById("demo-cap").getContext("2d");
+  const full = document.getElementById("demo-full").getContext("2d");
+  const PHONE = [936, 133, 234, 476], CAP = [40, 652, 1200, 60], OUTRO = 159;
+  const fmt = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
+  const draw = () => {
+    if (v.readyState >= 2) {
+      const out = v.currentTime >= OUTRO;
+      reveal.classList.toggle("outro", out);
+      if (out) full.drawImage(v, 0, 0, 1280, 720);
+      else { ph.drawImage(v, ...PHONE, 0, 0, 468, 952); cap.drawImage(v, ...CAP, 0, 0, 1800, 90); }
+      document.getElementById("demo-prog").style.width = `${(v.currentTime / (v.duration || 1)) * 100}%`;
+      document.getElementById("demo-time").textContent = `${fmt(v.currentTime)} / ${fmt(v.duration || 0)}`;
+    }
+    if (reveal.classList.contains("on")) requestAnimationFrame(draw);
+  };
+  v.addEventListener("loadeddata", draw);
+  v.addEventListener("play", () => { document.getElementById("demo-play").textContent = "❚❚"; requestAnimationFrame(draw); });
+  v.addEventListener("pause", () => { document.getElementById("demo-play").textContent = "▶"; });
+  document.getElementById("demo-play").onclick = () => (v.paused ? playWithSound() : v.pause());
+  document.getElementById("demo-phone").addEventListener("click", (e) => { e.stopPropagation(); v.paused ? playWithSound() : v.pause(); });
+  document.getElementById("demo-track").addEventListener("click", (e) => { e.stopPropagation(); const r = e.currentTarget.getBoundingClientRect(); v.currentTime = ((e.clientX - r.left) / r.width) * (v.duration || 0); });
   addEventListener("resize", fit);
   fit();
   const m = location.hash.match(/^#(\d+)$/);
