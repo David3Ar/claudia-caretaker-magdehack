@@ -1,37 +1,44 @@
 # Feature 3 — Live Location + Emergency Alert
 
-> Source: whiteboard `IMG_2837`. Priority: **M** (Primary #6 + #9; core cluster incl. messaging).
-> `C` = caregiver · `G` = senior. Requirements: [`specs/feature-spec.md`](../specs/feature-spec.md) §2.3 (LOC, EMG, MSG).
-
-| Step | Document |
-|---|---|
-| 1. Features + explanation | [`03-live-location/features.md`](03-live-location/features.md) |
-| 2. Flows (storyboards) | [`03-live-location/flows.md`](03-live-location/flows.md) |
-| 3. Design mockup | [`03-live-location/mockup.html`](03-live-location/mockup.html) (open in a browser) |
+> `C` = caregiver · `G` = senior
 
 ## Scope
 
-- **C sees G** — caregiver sees senior's location
-- **G sees C** — in brackets on board → lower priority
-  - "Where is my son?"
-  - "Ask him to call me"
-  - Direct "Call Jonas"
-- **Emergency alert** — triggers: voice ("Hey Claudia, help!"), button, not responding, smart watch (Could)
-- **Hands-free** — senior side is voice only after the wake word "Hey Claudia"
+- **Hands-free:** wake word "Hey Claudia" starts every conversation; after that `G` only talks
+- **C sees G:** place name, map, today's places; normal movement sends no push
+- **G sees C** (lower priority, consent **open**):
+  - "Where is my son?" → coarse answer ("at work")
+  - "Ask him to call me" → call request to `C`
+  - "Call Jonas" → direct call, no question back
+- **Emergency alert** → full-screen alert to every `C`, with location
+  - "Hey Claudia, help!"
+  - Button (fallback)
+  - Not responding → amber, then coral
+  - Smart watch (Could)
+- "Take action" after an alert → **open**
 
-## Open points
+## Structure
 
-- [ ] G sees C: in brackets on board → in demo or not?
-- [ ] "Take action" after alert: who is called, in which order; call emergency services (112)? Shown as example only
-- [ ] Not responding: retries, delays, which prompts count
-- [ ] G cancels emergency by voice ("I'm all right"): allowed? within what time?
-- [ ] Always-on wake word: battery, privacy, false triggers; ElevenLabs support for wake word in demo?
-- [ ] Auto-answer calls on speaker vs. ask first
-- [ ] Direct call not answered: offer call request automatically? voicemail?
-- [ ] Notify C when G leaves home? (mockup: off by default, dashboard switch)
-- [ ] Known places: who sets them (C in dashboard?)
-- [ ] Location source: phone GPS only for demo?
-- [ ] Privacy / consent for both directions; data retention of history
-- [ ] Messaging part of this cluster: scope beyond call request and direct call undefined
-- [ ] Smart watch trigger (Could) out of demo scope?
-- [ ] Proposed IDs HF-1, LOC-4, EMG-5 to be added to `feature-spec.md`
+```mermaid
+flowchart TD
+    LL[Live Location]:::core
+    LL --> HF["Hands-free<br/>Hey Claudia"]
+    LL --> CG["C sees G<br/>place, map, history"]
+    LL --> GC["G sees C<br/>coarse place"]
+    GC --> CR["Call request"]
+    GC --> DC["Direct call"]
+    LL --> EM[Emergency Alert]:::alert
+    EM --> T1["Voice: help"]
+    EM --> T2[Button]
+    EM --> T3[Not responding]
+    EM --> T4[Smart watch]
+    T1 --> ACT((Take action)):::alert
+    T2 --> ACT
+    T3 --> ACT
+    T4 --> ACT
+
+    classDef core fill:#e8590c,stroke:#e8590c,color:#fff
+    classDef alert fill:#e03131,stroke:#e03131,color:#fff
+```
+
+Spec, requirements and flows: [`specs/03-live-location/spec.md`](../specs/03-live-location/spec.md)
