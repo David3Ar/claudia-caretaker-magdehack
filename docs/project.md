@@ -1,10 +1,10 @@
-# Pilotprojektsteckbrief #6 — Mental Health bei pflegenden Angehörigen
+# Pilot #6 — Mental Health of Family Caregivers
 
-> Proactive voice agent for seniors → relief and transparency for family caregivers.
+> Because ‘I did’ feels better than ‘I wish I had.’
 
 ## Problem
 
-**Core:** Family caregivers face long-term stress, emotional strain and isolation. They are overlooked, and no low-barrier support fits their daily routine.
+Pilot #6 focuses on family caregivers who face long-term emotional strain, stress and social isolation. Their own needs are easily overlooked, and support can be hard to fit into daily life. Even after arranging a ride or reminding a parent to take their tablets, a caregiver may spend the day wondering what happened and blaming themselves for missing a check-in.
 
 | Driver | Impact on caregiver |
 |---|---|
@@ -16,7 +16,11 @@
 
 ## Solution
 
-A simple, voice-first agent app for every senior that **helps with daily routines** and **gives caregivers visibility**.
+Claudia helps seniors manage daily routines by voice and shares their confirmations with the family.
+
+- **For seniors**, asking what's on today, confirming tablets or calling family takes a few spoken words. That independence supports quality of life at home.
+- **For caregivers**, Claudia takes on repetitive reminders, follows up and automatically records the answers in the family diary. Over time, those entries build a shared care history. A relative can look up what Mum said after breakfast or who took her to her last appointment without asking her to tell the story again.
+- **For the family**, a shared calendar shows who agreed to help. If plans change, another relative can take over the ride when they see the request. Fewer coordination calls leave more time to enjoy each other's company.
 
 
 ## System Map

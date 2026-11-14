@@ -16,8 +16,9 @@
 
 | | |
 |---|---|
-| Problem | Family caregivers carry long-term stress and constant worry; the senior lives alone and the caregiver is the only lifeline |
-| Solution | Voice-first agent that helps `G` through the day and gives `C` visibility and relief |
+| Pilot #6 | Family caregivers face long-term stress and isolation. An unanswered question about a parent's day can turn into worry or self-reproach. |
+| Senior value | Voice reminders, confirmations and calls support independence and quality of life at home. |
+| Family value | Claudia follows up automatically and shares what the senior confirms. Relatives can respond to requests at different times and reassign a ride when plans change, leaving more time together. |
 | Demo scope | 4 core features (all `M`): Calendar, Pill Checker, Live Location + Emergency, QA / Setup |
 | Surfaces | Senior app (voice + large buttons) · caregiver app · web dashboard |
 | Business model | Monthly subscription · add-ons (automatic pill purchase, delivery fees) · delivery partnerships |
