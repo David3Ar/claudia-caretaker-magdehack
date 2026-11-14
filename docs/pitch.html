@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claudia Pitch Deck</title>
+<meta name="description" content="Claudia pitch for Magdehack Pilot #6: problem, competitors, what we solve, the four features, demo, next steps.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@300;400;500;600;700;800&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500&display=swap">
+<style>
+/* Tokens and components follow docs/design.html */
+:root {
+  --paper: #ffffff; --mist: #edf1ef; --ink: #000000; --ink-soft: #5c6662;
+  --grey: #8f9a95; --lime: #c6f432; --amber: #ffb23e; --coral: #ff5a3c; --hair: rgb(0 0 0 / 0.12);
+  --sans: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: Newsreader, Georgia, serif;
+  --r-s: 18px; --r-m: 32px; --r-l: 56px;
+  --ease: cubic-bezier(0.2, 0.75, 0.15, 1);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: #000; font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: antialiased; overflow: hidden; }
+h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+a { color: inherit; }
+.said { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+.soft { color: var(--ink-soft); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* Fixed 1920x1080 canvas, scaled to the window */
+.deck { position: fixed; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.slide { position: absolute; inset: 0; padding: 72px 104px 88px; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); overflow: hidden;
+  opacity: 0; visibility: hidden; transform: scale(1.015); transition: opacity 0.7s var(--ease), transform 0.9s var(--ease), visibility 0s 0.7s; }
+.slide.on { opacity: 1; visibility: visible; transform: none; transition: opacity 0.7s var(--ease), transform 0.9s var(--ease), visibility 0s; z-index: 1; }
+.slide.dark { --paper: #000000; --ink: #ffffff; --ink-soft: #9aa5a0; --mist: #1d2120; --hair: rgb(255 255 255 / 0.16); }
+
+/* Staggered entrance: every .in child rises in, in order of --i */
+.in { opacity: 0; transform: translateY(36px); transition: opacity 0.8s var(--ease), transform 1s var(--ease); transition-delay: 0s; }
+.on .in { opacity: 1; transform: none; transition-delay: calc(var(--i, 0) * 90ms + 150ms); }
+.back .in { transform: translateY(-36px); }
+.on .in.pop { transform: none; }
+.in.pop { transform: scale(0.85); }
+
+/* Slide chrome */
+.top { display: flex; align-items: center; justify-content: space-between; font-size: 26px; flex: none; }
+.brand { display: flex; align-items: center; gap: 16px; font-weight: 800; font-size: 32px; letter-spacing: -0.03em; }
+.kicker { display: inline-flex; align-items: center; gap: 12px; font-size: 26px; font-weight: 600; color: var(--ink-soft); }
+.kicker b { display: inline-grid; place-items: center; min-width: 48px; height: 48px; padding: 0 14px; border-radius: 99px; background: var(--ink); color: var(--paper); font-size: 22px; }
+.h1 { font-size: 132px; font-weight: 800; letter-spacing: -0.06em; line-height: 0.9; }
+.h2 { font-size: 92px; font-weight: 800; letter-spacing: -0.055em; line-height: 0.95; }
+.lead { font-size: 34px; line-height: 1.3; color: var(--ink-soft); max-width: 30ch; }
+.foot { position: absolute; left: 104px; right: 104px; bottom: 36px; display: flex; justify-content: space-between; font-size: 20px; color: var(--ink-soft); }
+
+/* Orb, same as design.html */
+.orb { --s: 160px; position: relative; width: var(--s); height: var(--s); flex: none; border-radius: 50%; display: grid; place-items: center; isolation: isolate; }
+.orb::before { content: ""; position: absolute; inset: 0; z-index: -2; border-radius: 50%; background: conic-gradient(var(--lime), var(--amber), var(--coral), var(--amber), var(--lime)); filter: blur(calc(var(--s) * 0.055)); animation: spin 14s linear infinite; }
+.orb::after { content: ""; position: absolute; inset: 7%; z-index: -1; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #ffffff, #e6eae8 75%); }
+.bars { display: flex; align-items: center; gap: calc(var(--s) * 0.045); height: calc(var(--s) * 0.32); }
+.bars i { width: calc(var(--s) * 0.055); height: 100%; border-radius: 99px; background: #000; transform: scaleY(0.17); }
+.orb[data-state="idle"] .bars { opacity: 0.35; }
+.orb[data-state="listening"]::after { inset: 13%; }
+.orb[data-state="listening"]::before { animation: spin 14s linear infinite, breathe 1.6s ease-in-out infinite; }
+.orb[data-state="speaking"] .bars i { animation: talk 0.7s ease-in-out infinite alternate; }
+.bars i:nth-child(2) { animation-delay: -0.45s !important; }
+.bars i:nth-child(3) { animation-delay: -0.2s !important; }
+.bars i:nth-child(4) { animation-delay: -0.6s !important; }
+.bars i:nth-child(5) { animation-delay: -0.3s !important; }
+@keyframes spin { to { rotate: 1turn; } }
+@keyframes breathe { 50% { scale: 1.09; } }
+@keyframes talk { from { transform: scaleY(0.2); } to { transform: scaleY(1); } }
+@keyframes glow { 50% { opacity: 0.55; } }
+
+/* Shared bits */
+.tag { display: inline-flex; align-items: center; gap: 12px; padding: 8px 20px; border-radius: 99px; box-shadow: inset 0 0 0 1.5px var(--hair); font-size: 24px; font-weight: 600; white-space: nowrap; }
+.tag::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--dot, var(--lime)); box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35); }
+.who { display: inline-grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 24px; font-weight: 700; flex: none; }
+.who.g { background: var(--lime); color: #000; }
+
+/* 1 Welcome */
+.welcome { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: auto; }
+.person { border-radius: var(--r-l); padding: 48px 52px; display: flex; flex-direction: column; gap: 22px; min-height: 420px; }
+.person.c { background: #1d2120; color: #fff; }
+.person.g { background: #fff; color: #000; --mist: #edf1ef; --ink: #000; --ink-soft: #5c6662; }
+.person header { display: flex; align-items: center; gap: 18px; font-size: 30px; font-weight: 700; }
+.person header span { color: var(--grey); font-weight: 500; }
+.person .words { display: flex; flex-wrap: wrap; gap: 12px; margin-top: auto; }
+.person .words span { padding: 12px 26px; border-radius: 99px; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; }
+.person.c .words span { background: rgb(255 255 255 / 0.1); }
+.person.c .words span.hot { background: var(--amber); color: #000; }
+.person.c .words span.hot2 { background: var(--coral); color: #000; }
+.person.g .words span { background: var(--mist); }
+.person q { font-family: var(--serif); font-style: italic; font-size: 44px; line-height: 1.1; quotes: "“" "”"; }
+.title-row { display: flex; align-items: flex-end; gap: 48px; margin-top: 64px; }
+
+/* 2 Problem */
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; margin-top: auto; align-items: end; }
+.stats { display: grid; gap: 28px; }
+.stat { display: grid; gap: 4px; padding-bottom: 28px; border-bottom: 1.5px solid var(--hair); }
+.stat b { font-size: 132px; font-weight: 800; letter-spacing: -0.06em; line-height: 0.9; }
+.stat span { font-size: 28px; color: var(--ink-soft); }
+.stat small { font-size: 18px; color: var(--ink-soft); }
+.worries { display: grid; gap: 16px; }
+.worry { display: flex; align-items: center; gap: 22px; padding: 24px 32px; border-radius: var(--r-m); background: var(--mist); font-size: 36px; line-height: 1.15; }
+.worry .said { font-size: 40px; }
+.worry .tag { margin-left: auto; font-size: 20px; padding: 6px 16px; }
+
+/* 3 Competitors */
+.comp { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: auto; }
+.cc { border-radius: var(--r-m); background: var(--mist); padding: 30px 30px 32px; display: flex; flex-direction: column; gap: 14px; min-height: 300px; }
+.cc h3 { font-size: 34px; font-weight: 800; letter-spacing: -0.035em; line-height: 1; }
+.cc .gives { font-size: 22px; color: var(--ink-soft); line-height: 1.3; }
+.cc .minus { margin-top: auto; display: flex; gap: 12px; font-size: 24px; font-weight: 600; line-height: 1.2; }
+.cc .minus::before { content: "–"; flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--coral); color: #000; font-weight: 800; font-size: 24px; line-height: 1; margin-top: -2px; }
+.cc.ended h3::after { content: "ended 2025"; margin-left: 12px; font-size: 18px; font-weight: 700; letter-spacing: 0; padding: 4px 12px; border-radius: 99px; background: var(--ink); color: var(--paper); vertical-align: middle; }
+
+/* 4 Where we come in */
+.matrix { margin-top: auto; width: 100%; border-collapse: separate; border-spacing: 0; font-size: 26px; }
+.matrix th { font-size: 20px; font-weight: 600; color: var(--ink-soft); text-align: center; padding: 0 8px 18px; line-height: 1.2; }
+.matrix th:first-child { text-align: left; }
+.matrix td { text-align: center; padding: 15px 8px; border-top: 1.5px solid var(--hair); }
+.matrix td:first-child { text-align: left; font-weight: 700; }
+.matrix .y::before, .matrix .p::before, .matrix .n::before { content: ""; display: inline-block; width: 22px; height: 22px; border-radius: 50%; }
+.matrix .y::before { background: #000; }
+.matrix .p::before { box-shadow: inset 0 0 0 3px #000; }
+.matrix .n::before { width: 22px; height: 3px; border-radius: 2px; background: #c3cbc7; vertical-align: middle; }
+.matrix tr.us td { background: var(--lime); border-top: 0; font-size: 30px; }
+.matrix tr.us td:first-child { border-radius: 24px 0 0 24px; padding-left: 28px; font-weight: 800; }
+.matrix tr.us td:last-child { border-radius: 0 24px 24px 0; }
+.matrix tr:not(.us) td:first-child { padding-left: 28px; }
+.legend { display: flex; gap: 36px; font-size: 20px; color: var(--ink-soft); margin-top: 20px; }
+.legend span { display: inline-flex; align-items: center; gap: 10px; }
+
+/* 5 Intro Claudia */
+.claudia { display: grid; grid-template-columns: 1fr 640px; gap: 80px; align-items: center; flex: 1; }
+.claudia .h1 { font-size: 112px; }
+.claudia .h1 em { font-style: normal; color: var(--lime); }
+.stagewrap { display: grid; justify-items: center; gap: 36px; text-align: center; }
+.heard { font-size: 40px; font-weight: 600; letter-spacing: -0.02em; }
+.answer { font-family: var(--serif); font-style: italic; font-size: 46px; line-height: 1.1; max-width: 16ch; }
+.pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+.pillar { border-radius: var(--r-m); padding: 28px 30px; background: var(--mist); display: grid; gap: 10px; }
+.pillar b { font-size: 30px; letter-spacing: -0.02em; line-height: 1.1; }
+.pillar span { font-size: 22px; color: var(--ink-soft); line-height: 1.3; }
+
+/* 6-9 Features */
+.feat { display: grid; grid-template-columns: 620px 1fr; gap: 56px; flex: 1; min-height: 0; margin-top: 40px; }
+.feat .text { display: flex; flex-direction: column; gap: 28px; }
+.feat .h2 { font-size: 96px; }
+.feat q { font-family: var(--serif); font-style: italic; font-size: 44px; line-height: 1.1; quotes: "“" "”"; }
+.points { display: grid; gap: 14px; }
+.points li { display: flex; gap: 16px; font-size: 27px; line-height: 1.3; }
+.points li::before { content: ""; flex: none; width: 14px; height: 14px; margin-top: 12px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 1.5px #000; }
+.flows { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; }
+.flows span { padding: 8px 18px; border-radius: 99px; background: var(--mist); font-size: 21px; font-weight: 600; }
+.open { display: inline-flex; align-items: center; gap: 12px; align-self: flex-start; padding: 16px 30px; border-radius: 99px; background: var(--ink); color: var(--paper); font-size: 24px; font-weight: 700; text-decoration: none; transition: transform 0.3s var(--ease); }
+.open:hover { transform: translateY(-3px); }
+.open::after { content: "→"; }
+.phones { display: flex; justify-content: flex-end; align-items: flex-end; gap: 20px; min-height: 0; }
+.ph { display: grid; gap: 14px; justify-items: center; margin: 0; }
+.ph img { display: block; height: 570px; aspect-ratio: 1080 / 1900; object-fit: cover; object-position: 50% 100%; }
+.ph:nth-child(2) img { height: 610px; }
+.ph p { font-size: 20px; font-weight: 600; color: var(--ink-soft); }
+.ph .who { width: 34px; height: 34px; font-size: 15px; vertical-align: middle; margin-right: 8px; }
+
+/* 10 Demo */
+.demo { flex: 1; margin-top: 40px; border-radius: var(--r-l); overflow: hidden; position: relative; background: #1d2120; display: grid; place-items: center; }
+.demo video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.demo .ph-empty { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 36px; text-align: center; color: #fff; }
+.demo .ph-empty p { font-size: 28px; color: #9aa5a0; }
+.demo .ph-empty code { font-size: 24px; color: var(--lime); }
+.demo.has-video .ph-empty { display: none; }
+
+/* 11 Future */
+.future { display: grid; grid-template-columns: 1fr 1.6fr; gap: 40px; margin-top: auto; }
+.lane { border-radius: var(--r-l); padding: 44px 48px; min-height: 460px; display: flex; flex-direction: column; gap: 26px; }
+.lane.s { background: var(--lime); }
+.lane.c { background: var(--mist); }
+.lane h3 { display: flex; align-items: baseline; gap: 16px; font-size: 52px; font-weight: 800; letter-spacing: -0.04em; }
+.lane h3 span { font-size: 24px; font-weight: 600; letter-spacing: 0; opacity: 0.6; }
+.lane ul { display: flex; flex-wrap: wrap; gap: 14px; }
+.lane li { padding: 16px 28px; border-radius: 99px; background: rgb(255 255 255 / 0.75); font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+.lane.s li { background: rgb(255 255 255 / 0.6); }
+.lane.c li { background: #fff; }
+.lane li small { display: block; font-size: 18px; font-weight: 500; color: var(--ink-soft); letter-spacing: 0; }
+
+/* 12 Thanks */
+.thanks { flex: 1; display: grid; place-items: center; align-content: center; gap: 56px; text-align: center; }
+.thanks .h1 { font-size: 220px; }
+.thanks .said { font-size: 64px; color: var(--ink-soft); }
+
+/* Controls (outside the canvas) */
+.bar { position: fixed; left: 0; bottom: 0; height: 4px; background: var(--lime); transition: width 0.6s var(--ease); z-index: 5; }
+.nav { position: fixed; right: 18px; bottom: 16px; display: flex; gap: 6px; z-index: 5; opacity: 0.25; transition: opacity 0.3s; }
+.nav:hover { opacity: 1; }
+.nav button { width: 40px; height: 40px; border: 0; border-radius: 50%; background: #1d2120; color: #fff; font: 600 18px var(--sans); cursor: pointer; }
+.count { position: fixed; left: 20px; bottom: 22px; font: 600 14px var(--sans); color: #8f9a95; z-index: 5; font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: 0.01s !important; transition-delay: 0s !important; } }
+</style>
+</head>
+<body>
+<main class="deck" id="deck">
+
+  <!-- 1 Welcome: background mini story -->
+  <section class="slide dark" data-title="Welcome">
+    <div class="top in" style="--i:0"><span class="brand"><span class="orb" data-state="idle" style="--s:48px"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></span>Claudia</span><span class="kicker">Magdehack · Pilot <b>#6</b></span></div>
+    <div class="title-row">
+      <h1 class="h1 in" style="--i:1">Two people,<br>one worry.</h1>
+    </div>
+    <div class="welcome">
+      <article class="person c in" style="--i:3">
+        <header><span class="who">J</span>Jonas <span>caregiver, son</span></header>
+        <q>Did she take her pills? Why isn't she answering?</q>
+        <div class="words"><span class="hot">stressed</span><span>overwhelmed</span><span>silent</span><span class="hot">worried</span><span class="hot2">burnt out</span></div>
+      </article>
+      <article class="person g in" style="--i:4">
+        <header><span class="who g">G</span>Grete <span>senior, lives alone</span></header>
+        <q>Nobody called today.</q>
+        <div class="words"><span>lonely</span><span>forgetful</span><span>doesn't want to be a bother</span></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 2 Intro #6 with pain points -->
+  <section class="slide" data-title="Pilot #6">
+    <div class="top in" style="--i:0"><span class="kicker">Context · Pilot <b>#6</b></span><span class="soft">The problem we are solving</span></div>
+    <h2 class="h2 in" style="--i:1; margin-top:48px; max-width:15ch">Mental health of family caregivers</h2>
+    <div class="cols">
+      <div class="stats">
+        <p class="stat in" style="--i:2"><b class="num">4.9 M</b><span>people in need of care are cared for at home in Germany, 86 %</span></p>
+        <p class="stat in" style="--i:3"><b class="num">3.1 M</b><span>of them mainly by relatives, with no care service</span><small>Destatis, care statistics 2023</small></p>
+      </div>
+      <ul class="worries">
+        <li class="worry in" style="--i:4"><span class="said">“Did Mum take her pills?”</span><span class="tag" style="--dot:var(--amber)">daily</span></li>
+        <li class="worry in" style="--i:5"><span class="said">“Where is she right now?”</span><span class="tag" style="--dot:var(--amber)">hourly</span></li>
+        <li class="worry in" style="--i:6"><span class="said">“Who drives her to the doctor?”</span><span class="tag" style="--dot:var(--amber)">weekly</span></li>
+        <li class="worry in" style="--i:7"><span class="said">“Why isn't she picking up?”</span><span class="tag" style="--dot:var(--coral)">panic</span></li>
+        <li class="worry in" style="--i:8"><span class="said">“Is she lonely?”</span><span class="tag" style="--dot:var(--grey)">always</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 3 Competitors: what they provide and the negatives -->
+  <section class="slide" data-title="Competitors">
+    <div class="top in" style="--i:0"><span class="kicker">Competitors in the market</span><span class="soft">What they provide, and what they miss</span></div>
+    <h2 class="h2 in" style="--i:1; margin-top:48px">Each fixes one piece.</h2>
+    <div class="comp">
+      <article class="cc in" style="--i:2"><h3>Hausnotruf</h3><p class="gives">Emergency button and 24/7 call centre. €23–39 a month</p><p class="minus">Emergencies only, button only, mostly at home</p></article>
+      <article class="cc in" style="--i:3"><h3>ElliQ</h3><p class="gives">Tabletop companion robot with screen</p><p class="minus">US and English only, one room, $249 plus lease</p></article>
+      <article class="cc ended in" style="--i:4"><h3>Alexa Together</h3><p class="gives">Caregiver feed on Echo speakers</p><p class="minus">Discontinued by Amazon, US only</p></article>
+      <article class="cc in" style="--i:5"><h3>MyTherapy, Medisafe</h3><p class="gives">Pill reminders with a dose diary</p><p class="minus">Senior must type and tap “done”: false records</p></article>
+      <article class="cc in" style="--i:6"><h3>Life360, Find My</h3><p class="gives">Family location map, paid SOS</p><p class="minus">A map, not “is she OK?”. Pings on every move</p></article>
+      <article class="cc in" style="--i:7"><h3>Doro phones</h3><p class="gives">Big-button phone with alarm button</p><p class="minus">Special hardware, no daily support</p></article>
+      <article class="cc in" style="--i:8"><h3>Smartwatches</h3><p class="gives">Fall detection on the wrist</p><p class="minus">Must be worn and charged; misses soft falls</p></article>
+      <article class="cc in" style="--i:9"><h3>Nui, DAK Pflege</h3><p class="gives">Guides and paperwork for carers</p><p class="minus">Nothing live; the senior isn't part of it</p></article>
+    </div>
+  </section>
+
+  <!-- 4 Where we come in -->
+  <section class="slide" data-title="Where we come in">
+    <div class="top in" style="--i:0"><span class="kicker">Where we come in</span><span class="soft">Problems with competitors</span></div>
+    <h2 class="h2 in" style="--i:1; margin-top:48px">Nobody joins the pieces.</h2>
+    <table class="matrix in" style="--i:2">
+      <thead><tr><th></th><th>Hands-free<br>voice</th><th>Pill<br>check</th><th>Calendar</th><th>Location<br>outside</th><th>Emergency<br>alert</th><th>Family<br>daily view</th><th>German,<br>in Germany</th></tr></thead>
+      <tbody>
+        <tr><td>Hausnotruf</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="p"></td><td class="y"></td><td class="n"></td><td class="y"></td></tr>
+        <tr><td>ElliQ</td><td class="y"></td><td class="p"></td><td class="y"></td><td class="n"></td><td class="p"></td><td class="p"></td><td class="n"></td></tr>
+        <tr><td>MyTherapy, Medisafe</td><td class="n"></td><td class="p"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="p"></td><td class="y"></td></tr>
+        <tr><td>Life360, Find My</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="y"></td><td class="p"></td><td class="p"></td><td class="y"></td></tr>
+        <tr><td>Doro, smartwatch</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="y"></td><td class="y"></td><td class="n"></td><td class="y"></td></tr>
+        <tr><td>Nui, DAK Pflege</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="p"></td><td class="y"></td></tr>
+        <tr class="us"><td>Claudia</td><td class="y"></td><td class="y"></td><td class="y"></td><td class="y"></td><td class="y"></td><td class="y"></td><td class="y"></td></tr>
+      </tbody>
+    </table>
+    <p class="legend in" style="--i:3"><span><i style="display:inline-block;width:18px;height:18px;border-radius:50%;background:#000"></i>yes</span><span><i style="display:inline-block;width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 3px #000"></i>partly or paid extra</span><span><i style="display:inline-block;width:18px;height:3px;background:#c3cbc7"></i>no</span></p>
+  </section>
+
+  <!-- 5 What we solve, intro Claudia -->
+  <section class="slide dark" data-title="Meet Claudia">
+    <div class="top in" style="--i:0"><span class="kicker">What we solve</span><span class="soft">Meet Claudia</span></div>
+    <div class="claudia">
+      <div>
+        <h2 class="h1 in" style="--i:1">Less time worrying about her routine. <em>More time with her.</em></h2>
+        <div class="pillars">
+          <div class="pillar in" style="--i:3"><b>Grete just talks</b><span>“Hey Claudia” and she's hands-free. No apps to learn.</span></div>
+          <div class="pillar in" style="--i:4"><b>Jonas sees calm</b><span>Pills, appointments, where she is. No calls to check.</span></div>
+          <div class="pillar in" style="--i:5"><b>Alerts only when it matters</b><span>Amber needs someone. Coral means act now.</span></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <p class="heard in" style="--i:2">“Hey Claudia, where is my son?”</p>
+        <div class="in pop" style="--i:3"><div class="orb" data-state="speaking" style="--s:340px"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div></div>
+        <p class="answer in" style="--i:4">Jonas is at work. Shall I ask him to call you?</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 Feature 1 -->
+  <section class="slide" data-title="Calendar">
+    <div class="top in" style="--i:0"><span class="kicker"><b>1</b> Feature</span><span class="soft">Calendar and scheduling</span></div>
+    <div class="feat">
+      <div class="text">
+        <h2 class="h2 in" style="--i:1">Calendar</h2>
+        <q class="in" style="--i:2">When is my next dentist appointment?</q>
+        <ul class="points">
+          <li class="in" style="--i:3">Grete asks by voice; Claudia answers and offers reminders</li>
+          <li class="in" style="--i:4">Family shares one calendar and assigns who drives</li>
+          <li class="in" style="--i:5">After each visit Claudia asks how it went and tells the family</li>
+        </ul>
+        <div class="flows in" style="--i:6"><span>Next appointment</span><span>Appointment check</span><span>Assign a caregiver</span><span>Daily mood</span><span>Weekly groceries</span><span>History</span></div>
+        <a class="open in" style="--i:7" href="specs/01-calendar/flows.html">Open the live mockup</a>
+      </div>
+      <div class="phones">
+        <figure class="ph in" style="--i:3"><img src="specs/01-calendar/img/next-appointment-step-1-asks.png" alt="Grete asks Claudia about her next appointment"><p>Grete asks</p></figure>
+        <figure class="ph in" style="--i:4"><img src="specs/01-calendar/img/next-appointment-step-3-answers.png" alt="Claudia answers with the date"><p>Claudia answers</p></figure>
+        <figure class="ph in" style="--i:5"><img style="aspect-ratio:1080/1700" src="specs/01-calendar/img/next-appointment-step-4-offers-reminders.png" alt="Claudia offers reminders"><p>Offers reminders</p></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 Feature 2 -->
+  <section class="slide" data-title="Pill checker">
+    <div class="top in" style="--i:0"><span class="kicker"><b>2</b> Feature</span><span class="soft">Pill checker</span></div>
+    <div class="feat">
+      <div class="text">
+        <h2 class="h2 in" style="--i:1">Pill checker</h2>
+        <q class="in" style="--i:2">Grete, did you take your Ramipril?</q>
+        <ul class="points">
+          <li class="in" style="--i:3">Plan sent by email, WhatsApp or photo, no typing</li>
+          <li class="in" style="--i:4">Claudia rings and asks; Grete says taken, not at home or forgot</li>
+          <li class="in" style="--i:5">Family alerted only after 3 strikes, plus low-stock warnings</li>
+          <li class="in" style="--i:6">Unsure which pill? Show it to the camera</li>
+        </ul>
+        <div class="flows in" style="--i:7"><span>Set up the plan</span><span>Taken</span><span>Not at home</span><span>Forgot</span><span>Low stock</span><span>Which pill?</span></div>
+        <a class="open in" style="--i:8" href="specs/02-pill-checker/flows.html">Open the live mockup</a>
+      </div>
+      <div class="phones">
+        <figure class="ph in" style="--i:3"><img src="specs/02-pill-checker/img/taken-step-2-asks.png" alt="Claudia asks whether the pill was taken"><p>Claudia asks</p></figure>
+        <figure class="ph in" style="--i:4"><img src="specs/02-pill-checker/img/forgot-step-4-alert.png" alt="Jonas gets an alert after three strikes"><p>Third strike: Jonas knows</p></figure>
+        <figure class="ph in" style="--i:5"><img src="specs/02-pill-checker/img/which-pill-step-3-recognises.png" alt="Claudia recognises the pill on camera"><p>Which pill?</p></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 Feature 3 -->
+  <section class="slide" data-title="Live location">
+    <div class="top in" style="--i:0"><span class="kicker"><b>3</b> Feature</span><span class="soft">Live location and emergency alert</span></div>
+    <div class="feat">
+      <div class="text">
+        <h2 class="h2 in" style="--i:1">Live location + help</h2>
+        <q class="in" style="--i:2">Hey Claudia, help!</q>
+        <ul class="points">
+          <li class="in" style="--i:3">Jonas sees “At home since 11:20”; normal walks send no push</li>
+          <li class="in" style="--i:4">Grete calls for help by voice, even with the phone out of reach</li>
+          <li class="in" style="--i:5">Every caregiver gets a full-screen alert with her location</li>
+          <li class="in" style="--i:6">No answer? Amber, then coral, on its own</li>
+        </ul>
+        <div class="flows in" style="--i:7"><span>Where is Grete?</span><span>Where is my son?</span><span>Call Jonas</span><span>Help!</span><span>No answer</span></div>
+        <a class="open in" style="--i:8" href="specs/03-live-location/flows.html">Open the live mockup</a>
+      </div>
+      <div class="phones">
+        <figure class="ph in" style="--i:3"><img src="specs/03-live-location/img/where-is-grete-step-2-taps-pin.png" alt="Jonas sees where Grete is on a map"><p>Where Grete is</p></figure>
+        <figure class="ph in" style="--i:4"><img src="specs/03-live-location/img/help-step-2-alarm.png" alt="Claudia raises the alarm on Grete's phone"><p>Grete calls for help</p></figure>
+        <figure class="ph in" style="--i:5"><img src="specs/03-live-location/img/help-step-3-alert.png" alt="Jonas gets a full-screen alert"><p>Every caregiver knows</p></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 Feature 4 -->
+  <section class="slide" data-title="QA and setup">
+    <div class="top in" style="--i:0"><span class="kicker"><b>4</b> Feature</span><span class="soft">QA and setup</span></div>
+    <div class="feat">
+      <div class="text">
+        <h2 class="h2 in" style="--i:1">QA + setup</h2>
+        <q class="in" style="--i:2">Shall I tell Jonas?</q>
+        <ul class="points">
+          <li class="in" style="--i:3">Setup by voice, family code instead of passwords</li>
+          <li class="in" style="--i:4">Everyday questions in two calm sentences; no medical advice</li>
+          <li class="in" style="--i:5">Grete decides what Jonas hears; nothing private leaves without her yes</li>
+          <li class="in" style="--i:6">Lonely? Claudia offers, asks once more gently, then respects her</li>
+        </ul>
+        <div class="flows in" style="--i:7"><span>Set up</span><span>Ask anything</span><span>Health question</span><span>Diary</span><span>Change a setting</span><span>Feeling lonely</span></div>
+        <a class="open in" style="--i:8" href="specs/04-qa-setup/flows.html">Open the live mockup</a>
+      </div>
+      <div class="phones">
+        <figure class="ph in" style="--i:3"><img src="specs/04-qa-setup/img/set-up-step-5-family-code.png" alt="Claudia gives Grete the family code"><p>Family code</p></figure>
+        <figure class="ph in" style="--i:4"><img src="specs/04-qa-setup/img/diary-step-2-asks-before-sharing.png" alt="Claudia asks before sharing"><p>Asks before sharing</p></figure>
+        <figure class="ph in" style="--i:5"><img src="specs/04-qa-setup/img/feeling-lonely-step-7-warm-nudge.png" alt="Jonas gets a warm nudge"><p>A warm nudge</p></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 Demo video -->
+  <section class="slide dark" data-title="Demo">
+    <div class="top in" style="--i:0"><span class="kicker">Demo</span><span class="soft">Claudia, live with ElevenLabs</span></div>
+    <div class="demo in" style="--i:1" id="demo">
+      <video id="demo-video" src="media/demo.mp4" controls playsinline preload="metadata"></video>
+      <div class="ph-empty">
+        <div class="orb" data-state="listening" style="--s:260px"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
+        <p>Demo video goes here</p>
+        <code>docs/media/demo.mp4</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 Future updates -->
+  <section class="slide" data-title="What's next">
+    <div class="top in" style="--i:0"><span class="kicker">Future updates</span><span class="soft">After the demo</span></div>
+    <h2 class="h2 in" style="--i:1; margin-top:48px">What's next</h2>
+    <div class="future">
+      <div class="lane s in" style="--i:2">
+        <h3>Should <span>next</span></h3>
+        <ul><li>Daily check</li><li>Message to anyone</li><li>Delivery<small>Shop Apotheke, Lieferando</small></li></ul>
+      </div>
+      <div class="lane c in" style="--i:3">
+        <h3>Could <span>later</span></h3>
+        <ul><li>Time capsule</li><li>Smart watch</li><li>Custom voice</li><li>Camera identifies objects</li><li>Smart home</li><li>Pill box with sensors</li><li>Ringtones</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 Thank you -->
+  <section class="slide dark" data-title="Thank you">
+    <div class="top in" style="--i:0"><span class="brand"><span class="orb" data-state="idle" style="--s:48px"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></span>Claudia</span><span class="kicker">Magdehack · Pilot <b>#6</b></span></div>
+    <div class="thanks">
+      <div class="in pop" style="--i:1"><div class="orb" data-state="speaking" style="--s:260px"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div></div>
+      <h2 class="h1 in" style="--i:2">Thank you.</h2>
+      <p class="said in" style="--i:3">Hey Claudia, any questions?</p>
+    </div>
+  </section>
+
+</main>
+<div class="bar" id="bar"></div>
+<p class="count" id="count"></p>
+<div class="nav"><button type="button" id="prev" aria-label="Previous slide">←</button><button type="button" id="next" aria-label="Next slide">→</button><button type="button" id="full" aria-label="Full screen">⤢</button></div>
+
+<script>
+(() => {
+  const deck = document.getElementById("deck");
+  const slides = [...deck.querySelectorAll(".slide")];
+  let n = 0;
+  const fit = () => {
+    const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+    deck.style.transform = `scale(${s}) translate(-50%, -50%)`;
+  };
+  const show = (k, dir = 1) => {
+    k = Math.max(0, Math.min(slides.length - 1, k));
+    slides.forEach((el, j) => { el.classList.toggle("on", j === k); el.classList.toggle("back", dir < 0); });
+    n = k;
+    document.getElementById("bar").style.width = `${((k + 1) / slides.length) * 100}%`;
+    document.getElementById("count").textContent = `${k + 1} / ${slides.length} · ${slides[k].dataset.title}`;
+    history.replaceState(null, "", `#${k + 1}`);
+    const v = document.getElementById("demo-video");
+    if (slides[k].contains(v)) { v.play?.().catch(() => {}); } else { v.pause?.(); }
+  };
+  const next = () => show(n + 1, 1), prev = () => show(n - 1, -1);
+  addEventListener("keydown", (e) => {
+    if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); next(); }
+    if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); prev(); }
+    if (e.key === "Home") show(0, -1);
+    if (e.key === "End") show(slides.length - 1);
+    if (e.key === "f") document.documentElement.requestFullscreen?.();
+  });
+  document.getElementById("next").onclick = next;
+  document.getElementById("prev").onclick = prev;
+  document.getElementById("full").onclick = () => document.documentElement.requestFullscreen?.();
+  deck.addEventListener("click", (e) => { if (!e.target.closest("a, video, button")) next(); });
+  let tx = null;
+  addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; }, { passive: true });
+  addEventListener("touchend", (e) => { if (tx == null) return; const d = e.changedTouches[0].clientX - tx; if (Math.abs(d) > 50) (d < 0 ? next : prev)(); tx = null; });
+  const v = document.getElementById("demo-video");
+  v.addEventListener("loadeddata", () => document.getElementById("demo").classList.add("has-video"));
+  addEventListener("resize", fit);
+  fit();
+  const m = location.hash.match(/^#(\d+)$/);
+  requestAnimationFrame(() => show(m ? +m[1] - 1 : 0));
+})();
+</script>
+</body>
+</html>
