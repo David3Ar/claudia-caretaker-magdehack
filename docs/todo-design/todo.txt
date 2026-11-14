@@ -1,0 +1,19 @@
+Hi create a very nice desig.html seee example-design.html (thats from another product and we need no token pipeline)
+Based on the informations in our repo.
+
+Style we want you too get inspired by this free designs - use detaileed websearch and screenshots in browser mode:
+
+Design Example 1:
+https://www.awwwards.com/inspiration/design-onlines
+https://www.awwwards.com/sites/onlines
+https://www.awwwards.com/inspiration/team-onlines
+
+
+
+Also see the img in todo-design/img and put the newly created design.html into docs 
+
+Important Design Principles: 
+
+Simplicity - App is made for non techies and abstract technical concepts well. 
+Voice First - The app is designed to be controlled with voice. Buttons to receive core information or core features like  (emergency calls) can be present
+
