@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ponytail"
+  short_description: "Choose the smallest complete solution"
+  default_prompt: "Use $ponytail to choose the smallest complete solution for this change."
