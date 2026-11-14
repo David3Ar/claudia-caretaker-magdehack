@@ -10,10 +10,19 @@ https://www.awwwards.com/inspiration/team-onlines
 
 
 
+The cleaness of this design: 
+https://www.awwwards.com/sites/hozon-the-art-of-keeping
+https://www.awwwards.com/inspiration/mobile-hozon-the-art-of-keeping (also mobile looks very good and placed well)
+
+
+The art of making simple lighweight looking frontend designs we should let insprire us with that:
+https://www.awwwards.com/sites/see-for-yourself
+
+
 Also see the img in todo-design/img and put the newly created design.html into docs 
 
 Important Design Principles: 
 
-Simplicity - App is made for non techies and abstract technical concepts well. 
-Voice First - The app is designed to be controlled with voice. Buttons to receive core information or core features like  (emergency calls) can be present
-
+Simplicity - App is made for non techies please abstract technical concepts well. 
+Voice First - The app is designed to be controlled with voice mainly from G but also from C. Buttons to receive core information or core features like  (emergency calls) can be present
+C should also have better ui options to add appointments and stuff directly. Also web dashboard for configuraiton would be nice.
