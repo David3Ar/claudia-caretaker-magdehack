@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pill Checker Flows</title>
+<meta name="description" content="The six pill checker flows of Claudia, step by step. Pick a flow, then go through it screen by screen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@1,6..72,400&display=swap">
+<style>
+/* Tokens and components follow docs/design.html. Page and player are the same as 01-calendar/flows.html */
+:root {
+  --paper: #ffffff; --mist: #edf1ef; --ink: #000000; --ink-soft: #5c6662;
+  --lime: #c6f432; --amber: #ffb23e; --coral: #ff5a3c; --hair: rgb(0 0 0 / 0.12);
+  --sans: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: Newsreader, Georgia, serif;
+  --r-s: 0.75rem; --r-m: 1.5rem; --r-l: 2.75rem;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-family: var(--sans); color: var(--ink); background: var(--paper); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4, h5, p, ul, ol, dl, dd { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.soft { color: var(--ink-soft); }
+.num { font-variant-numeric: tabular-nums; }
+.said { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* Page */
+.page { max-width: 86rem; margin: 0 auto; padding: 1.5rem clamp(1rem, 4vw, 3rem) 3rem; display: grid; gap: 1.5rem; }
+.head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem; }
+.brand { display: flex; align-items: center; gap: 0.625rem; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.03em; margin-right: auto; }
+.head a { color: var(--ink); }
+.picker { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.picker button { border: 0; padding: 0.625rem 1.125rem; border-radius: 99rem; background: var(--mist); font-weight: 600; text-align: left; }
+.picker button span { color: var(--ink-soft); font-weight: 400; margin-right: 0.375rem; }
+.picker button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.picker button[aria-pressed="true"] span { color: rgb(255 255 255 / 0.65); }
+
+/* Stage: text and controls left, device right */
+.stage { display: grid; grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 4rem); align-items: start; }
+.info { display: grid; gap: 1.25rem; position: sticky; top: 1.5rem; }
+.info h1 { font-size: clamp(2.25rem, 4.4vw, 3.75rem); font-weight: 800; letter-spacing: -0.05em; line-height: 0.95; }
+.count { font-size: 1.0625rem; color: var(--ink-soft); }
+.actor { display: inline-flex; align-items: center; gap: 0.5rem; justify-self: start; padding: 0.25rem 0.875rem 0.25rem 0.25rem; border-radius: 99rem; background: var(--mist); font-weight: 600; }
+.actor .who, .actor .orb { --s: 1.75rem; width: 1.75rem; height: 1.75rem; }
+.info h2 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+.info .why { color: var(--ink-soft); max-width: 34ch; font-size: 1.0625rem; }
+.example[hidden] { display: none; }
+.example { display: inline-block; padding: 0.125rem 0.625rem; border-radius: 99rem; box-shadow: inset 0 0 0 1px var(--hair); font-size: 0.875rem; color: var(--ink-soft); justify-self: start; }
+.nav { display: flex; align-items: center; gap: 0.5rem; }
+.dots { display: flex; gap: 0.25rem; margin: 0 0.5rem; flex-wrap: wrap; }
+.dots button { width: 2rem; height: 2rem; border: 0; border-radius: 50%; background: var(--mist); font-weight: 600; font-size: 0.875rem; }
+.dots button[aria-current="step"] { background: var(--ink); color: var(--paper); }
+.hint { font-size: 0.875rem; color: var(--ink-soft); }
+.device { display: grid; justify-items: center; gap: 0.875rem; min-width: 0; }
+.device > p { font-size: 0.9375rem; color: var(--ink-soft); }
+
+/* Components from design.html */
+.orb { --s: 10rem; position: relative; width: var(--s); height: var(--s); flex: none; border-radius: 50%; display: grid; place-items: center; isolation: isolate; }
+.orb::before { content: ""; position: absolute; inset: 0; z-index: -2; border-radius: 50%; background: conic-gradient(var(--lime), var(--amber), var(--coral), var(--amber), var(--lime)); filter: blur(calc(var(--s) * 0.055)); animation: spin 14s linear infinite; }
+.orb::after { content: ""; position: absolute; inset: 7%; z-index: -1; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #ffffff, #e6eae8 75%); }
+.bars { display: flex; align-items: center; gap: calc(var(--s) * 0.045); height: calc(var(--s) * 0.32); }
+.bars i { width: calc(var(--s) * 0.055); height: 100%; border-radius: 99rem; background: var(--ink); transform: scaleY(0.17); }
+.orb[data-state="idle"] .bars { opacity: 0.35; }
+.orb[data-state="listening"]::after { inset: 13%; }
+.orb[data-state="listening"]::before { animation: spin 14s linear infinite, breathe 1.6s ease-in-out infinite; }
+.orb[data-state="thinking"]::before { animation-duration: 2.2s; }
+.orb[data-state="thinking"]::after { inset: 4%; }
+.orb[data-state="thinking"] .bars i { animation: hop 0.9s ease-in-out infinite; }
+.orb[data-state="speaking"] .bars i { animation: talk 0.7s ease-in-out infinite alternate; }
+.bars i:nth-child(2) { animation-delay: -0.45s !important; }
+.bars i:nth-child(3) { animation-delay: -0.2s !important; }
+.bars i:nth-child(4) { animation-delay: -0.6s !important; }
+.bars i:nth-child(5) { animation-delay: -0.3s !important; }
+@keyframes spin { to { rotate: 1turn; } }
+@keyframes breathe { 50% { scale: 1.09; } }
+@keyframes talk { from { transform: scaleY(0.2); } to { transform: scaleY(1); } }
+@keyframes hop { 0%, 100% { transform: scaleY(0.17) translateY(0); } 50% { transform: scaleY(0.17) translateY(-160%); } }
+@keyframes ring { 0%, 100% { rotate: 0deg; } 10%, 30% { rotate: -12deg; } 20%, 40% { rotate: 12deg; } 50% { rotate: 0deg; } }
+
+.phone { width: 20rem; max-width: 100%; aspect-ratio: 9 / 18.5; border: 2px solid var(--ink); border-radius: var(--r-l); background: var(--paper); padding: 1.25rem 1.125rem 1.125rem; display: flex; flex-direction: column; gap: 0.75rem; overflow: hidden; }
+.phone::before { content: ""; align-self: center; width: 4.5rem; height: 1.125rem; border-radius: 99rem; background: var(--ink); flex: none; }
+.phone.dark { background: var(--ink); color: var(--paper); }
+.phone.dark::before { background: #262626; }
+.phone.lock { background: var(--mist); }
+.phone.warn { background: var(--amber); }
+.grow { flex: 1; display: grid; place-items: center; align-content: center; gap: 1.25rem; text-align: center; min-height: 0; }
+.grow.left { justify-items: start; text-align: left; }
+.grow.top { align-content: start; justify-items: stretch; text-align: left; gap: 0.875rem; }
+.p-hello { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+.p-said { font-size: 1.5rem; line-height: 1.15; }
+.p-said.sm { font-size: 1.25rem; }
+.p-heard { font-size: 1.4375rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+.p-q { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; }
+.listening { font-size: 0.9375rem; color: rgb(255 255 255 / 0.6); text-align: center; }
+.clock { font-size: 3.5rem; font-weight: 700; letter-spacing: -0.05em; line-height: 1; text-align: center; margin-top: 1.5rem; }
+.push { display: grid; gap: 0.25rem; padding: 0.875rem 1rem; border-radius: var(--r-m); background: var(--paper); line-height: 1.25; text-align: left; box-shadow: 0 0 0 2px var(--ink); }
+.push b { display: flex; align-items: center; gap: 0.5rem; }
+.push .orb { --s: 1.5rem; }
+.big { display: flex; align-items: center; justify-content: center; gap: 0.625rem; width: 100%; min-height: 4rem; padding: 0.75rem 1rem; border-radius: var(--r-m); background: var(--ink); color: var(--paper); font-size: 1.25rem; font-weight: 700; text-align: center; line-height: 1.1; flex: none; }
+.big.sos { background: var(--coral); color: var(--ink); }
+.big.yes { background: var(--lime); color: var(--ink); }
+.big.ghost { background: none; color: inherit; box-shadow: inset 0 0 0 2px currentColor; }
+.big.mid { min-height: 3.25rem; font-size: 1.0625rem; }
+.big.on { box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--ink); }
+.tag { justify-self: start; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 99rem; background: var(--paper); box-shadow: inset 0 0 0 1px var(--hair); font-size: 0.9375rem; font-weight: 500; white-space: nowrap; }
+.tag::before { content: ""; width: 0.625rem; height: 0.625rem; border-radius: 50%; background: var(--dot, var(--lime)); box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35); flex: none; }
+.grow:not(.left):not(.top) .tag { justify-self: center; }
+.phone > .tag { align-self: flex-start; }
+.who { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 0.8125rem; font-weight: 700; flex: none; }
+.who.b { background: var(--mist); color: var(--ink); box-shadow: inset 0 0 0 1px var(--hair); }
+.who.g { background: var(--lime); color: var(--ink); }
+.rows li { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--hair); line-height: 1.25; }
+.rows li:last-child { border-bottom: 0; }
+.rows .t { width: 3.25rem; flex: none; font-weight: 600; }
+.rows .what { flex: 1; min-width: 0; }
+.rows .what span { display: block; color: var(--ink-soft); font-size: 0.875rem; }
+.sum { display: grid; grid-template-columns: auto 1fr; gap: 0 1rem; font-size: 0.9375rem; }
+.sum dt, .sum dd { padding: 0.5rem 0; border-top: 1px solid var(--hair); }
+.sum dt { color: var(--ink-soft); }
+.sum dd { font-weight: 600; }
+.tabbar { display: flex; align-items: center; justify-content: space-between; padding: 0 0.75rem; flex: none; margin-top: auto; }
+.tabbar .mic { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 1.125rem; }
+.tabbar .side { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--mist); }
+
+/* Pill checker */
+.ringing { display: grid; justify-items: center; gap: 0.75rem; }
+.ringing .orb { animation: ring 1.4s ease-in-out infinite; }
+.or { font-size: 0.875rem; color: var(--ink-soft); text-align: center; flex: none; }
+.or b { color: var(--ink); }
+.choice { display: grid; gap: 0.5rem; flex: none; }
+.dose { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0.75rem; border-radius: var(--r-s); background: var(--mist); line-height: 1.2; }
+.dose .what { flex: 1; min-width: 0; }
+.dose .what span { display: block; color: var(--ink-soft); font-size: 0.8125rem; }
+.dose .n { font-weight: 700; font-size: 0.875rem; }
+.pill-ico { width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--paper); box-shadow: inset 0 0 0 2px var(--ink); flex: none; }
+.pill-ico.long { width: 2.25rem; height: 1.125rem; border-radius: 99rem; }
+.pill-ico.y { background: #ffe58a; }
+.strikes { display: flex; gap: 0.375rem; align-items: center; }
+.strikes i { width: 1.75rem; height: 0.625rem; border-radius: 99rem; box-shadow: inset 0 0 0 1.5px var(--ink); }
+.strikes i.on { background: var(--amber); box-shadow: none; }
+.strikes span { margin-left: 0.375rem; font-weight: 700; font-size: 0.9375rem; }
+.phone.warn .strikes i { box-shadow: inset 0 0 0 1.5px var(--ink); }
+.phone.warn .strikes i.on { background: var(--ink); }
+.grow.left .strikes { justify-self: start; }
+.doc { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-radius: var(--r-m); background: var(--paper); text-align: left; line-height: 1.2; box-shadow: 0 0 0 1px var(--hair); }
+.doc b { display: block; }
+.doc span { font-size: 0.8125rem; color: var(--ink-soft); }
+.doc .ico { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: var(--r-s); background: var(--mist); flex: none; }
+.chat { display: grid; gap: 0.5rem; }
+.bubble { justify-self: end; max-width: 85%; padding: 0.625rem 0.875rem; border-radius: 1.125rem 1.125rem 0.25rem 1.125rem; background: var(--lime); font-size: 0.9375rem; line-height: 1.25; text-align: left; }
+.bubble.in { justify-self: start; background: var(--mist); border-radius: 1.125rem 1.125rem 1.125rem 0.25rem; }
+.cam { position: relative; flex: 1; border-radius: var(--r-m); background: #1c1f1e; overflow: hidden; display: grid; place-items: center; min-height: 0; }
+.cam .box { position: relative; width: 70%; aspect-ratio: 1.5; border-radius: 0.5rem; background: #e9ecef; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.375rem; padding: 0.875rem; rotate: -6deg; }
+.cam .box i { border-radius: 99rem; background: #fff; box-shadow: inset 0 0 0 2px #b8c0bc; }
+.cam .box b { position: absolute; left: 0.5rem; top: -1.5rem; font-size: 0.75rem; color: #fff; rotate: 6deg; }
+.cam .frame { position: absolute; inset: 18% 10%; border: 3px solid var(--lime); border-radius: var(--r-m); }
+.cam .found { position: absolute; left: 0.75rem; right: 0.75rem; bottom: 0.75rem; padding: 0.5rem 0.75rem; border-radius: var(--r-s); background: var(--ink); color: var(--paper); font-size: 0.875rem; line-height: 1.2; text-align: left; }
+.cam .found b { display: block; color: var(--lime); font-size: 1.0625rem; }
+
+/* Theme: caregiver screens (app, dashboard) are dark by default, Grete's phone is light. Both can be switched in settings. */
+[data-theme="dark"] { --paper: #000000; --ink: #ffffff; --ink-soft: #9aa5a0; --mist: #1d2120; --hair: rgb(255 255 255 / 0.16); color: var(--ink); }
+[data-theme="dark"] :is(.note, .phone.alarm, .phone.warn, .ev.done, .ev.rem, .ev.moved, .ev.missed, .big.yes, .big.sos, .who.g, .bubble:not(.in), .pick > span.on .who) { --paper: #ffffff; --ink: #000000; --ink-soft: #5c6662; --mist: #edf1ef; --hair: rgb(0 0 0 / 0.12); color: #000000; }
+[data-theme="dark"] > p { color: var(--ink-soft); }
+[data-theme="dark"] .phone { border-color: #000000; }
+[data-theme="dark"] .phone::before { background: #262626; }
+[data-theme="dark"] .phone.dark { background: #000000; color: #ffffff; }
+[data-theme="dark"] .phone.alarm::before, [data-theme="dark"] .phone.warn::before { background: #000000; }
+[data-theme="dark"] .map svg g { stroke: #333a37; }
+[data-theme="dark"] .map svg path[stroke="#000"] { stroke: #ffffff; }
+[data-theme="dark"] .map svg circle[fill="#000"] { fill: #ffffff; }
+[data-theme="dark"] .map .here { background: #000000; color: #ffffff; box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25); }
+[data-theme="dark"] .push { box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25); }
+[data-theme="dark"] .ev.new { box-shadow: 0 0 0 2px #000000, 0 0 0 4px #ffffff; }
+[data-theme="dark"] .day.now { background: #2b302e; }
+[data-theme="dark"] .day.now h5, [data-theme="dark"] .day.now h5 b { color: #ffffff; }
+[data-theme="dark"] .day.now .ev:not(.done):not(.moved):not(.missed):not(.rem) { background: #000000; }
+[data-theme="dark"] .check { background-color: #2b302e; }
+[data-theme="dark"] .switch:not(.on) { background: #3a403e; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } .orb[data-state="speaking"] .bars i:nth-child(odd) { transform: scaleY(0.9); } .orb[data-state="speaking"] .bars i:nth-child(even) { transform: scaleY(0.5); } }
+@media (max-width: 60rem) {
+  .stage { grid-template-columns: minmax(0, 1fr); }
+  .info { position: static; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.500 1.500a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4h13v16H5a2 2 0 0 1 0-4h13"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></symbol>
+</svg>
+
+<div class="page">
+  <header class="head">
+    <span class="brand"><span class="orb" style="--s:1.75rem" data-state="idle"></span>Claudia, pill checker flows</span>
+    <a href="spec.md">Spec</a>
+    <a href="../../design.html">Design</a>
+  </header>
+  <nav class="picker" id="picker" aria-label="Flow"></nav>
+  <main class="stage">
+    <section class="info" aria-live="polite">
+      <h1 id="flow-title"></h1>
+      <p class="count" id="count"></p>
+      <span class="actor" id="actor"></span>
+      <h2 id="step-title"></h2>
+      <p class="why" id="step-why"></p>
+      <span class="example" id="example" hidden>Example content, open in the spec</span>
+      <div class="nav">
+        <button type="button" class="big mid ghost" id="prev" style="width:auto;padding:0 1.25rem">Back</button>
+        <div class="dots" id="dots"></div>
+        <button type="button" class="big mid" id="next" style="width:auto;padding:0 1.5rem">Next</button>
+      </div>
+      <p class="hint">Caregiver screens are dark and Grete's are light by default; both can be changed in settings. Arrow keys work too. People, medicines, times and numbers are made up.</p>
+    </section>
+    <section class="device">
+      <p id="dev-label"></p>
+      <div id="dev" style="display:contents"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+(() => {
+  const ic = (n) => `<svg class="i"><use href="#i-${n}"/></svg>`;
+  const orb = (state, s) => `<div class="orb" data-state="${state}" style="--s:${s}rem" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>`;
+  const tabbar = `<div class="tabbar"><span class="side">${ic("book")}</span><span class="mic">${ic("mic")}</span><span class="side">${ic("plus")}</span></div>`;
+  const tag = (t, dot) => `<span class="tag"${dot ? ` style="--dot:var(--${dot})"` : ""}>${t}</span>`;
+  const strikes = (n) => `<span class="strikes" role="img" aria-label="${n} of 3 strikes">${[0, 1, 2].map((k) => `<i class="${k < n ? "on" : ""}"></i>`).join("")}<span class="num">${n}/3</span></span>`;
+
+  // Grete
+  const hear = (text) => `<div class="phone dark"><div class="grow">${orb("listening", 9.5)}<p class="p-heard">${text}</p></div><p class="listening">Listening</p></div>`;
+  const gSay = (text, state = "speaking", extra = "") => `<div class="phone"><div class="grow">${orb(state, 7.5)}<p class="p-said said">${text}</p>${extra}</div><span class="big">${ic("phone")}Call Jonas</span><span class="big sos">Emergency</span></div>`;
+  const gRing = (time, what) => `<div class="phone dark"><p class="clock num">${time}</p><div class="grow"><div class="ringing">${orb("idle", 7)}<p class="p-hello">Claudia is calling</p><p class="listening">${what}</p></div></div><span class="big yes">${ic("phone")}Answer</span></div>`;
+  const choose = (on) => { const b = (k, cls, t) => `<span class="big mid ${cls}${on === k ? " on" : ""}">${t}</span>`; return `<div class="choice">${b(0, "yes", "Taken")}${b(1, "ghost", "Not at home")}${b(2, "ghost", "Forgot")}</div><p class="or">or just say it</p>`; };
+  const gCheck = (text, on, extra = "") => `<div class="phone"><div class="grow left">${orb("speaking", 4)}<p class="p-said said">${text}</p>${extra}</div>${choose(on)}<span class="big ghost mid">${ic("cam")}Which pill is this?</span></div>`;
+  const gScan = (found) => `<div class="phone dark"><p class="p-hello">Which pill is this?</p><div class="cam"><div class="box"><b>Ramipril 5 mg</b><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="frame"></span>${found ? `<p class="found"><b>Ramipril 5 mg</b>Blood pressure · 1 in the morning</p>` : ""}</div><p class="listening">${found ? "Found it" : "Hold the box in front of the camera"}</p></div>`;
+
+  // Jonas
+  const cCard = (title, body) => `<div class="phone"><p class="p-hello">${title}</p><div class="grow top">${body}</div>${tabbar}</div>`;
+  const cSay = (text, extra = "", state = "speaking") => `<div class="phone"><div class="grow">${orb(state, 6)}<p class="p-said said sm">${text}</p>${extra}</div>${tabbar}</div>`;
+  const lock = (time, text) => `<div class="phone lock"><p class="clock num">${time}</p><div class="grow top" style="margin-top:1.5rem"><div class="push"><b>${orb("idle", 1.5)}Claudia<span class="soft" style="font-weight:400;margin-left:auto">now</span></b>${text}</div></div></div>`;
+  const dose = (cls, name, how, n) => `<div class="dose"><span class="pill-ico ${cls}"></span><span class="what">${name}<span>${how}</span></span><span class="n num">${n}</span></div>`;
+  const plan = `${dose("", "Ramipril 5 mg", "White, round · 1 at 8:00", "30")}${dose("long", "Metformin 500 mg", "White, long · 1 at 8:00, 1 at 20:00", "60")}${dose("y", "Vitamin D 1000", "Yellow, small · 1 at 8:00", "90")}`;
+  const diary = (rows) => `<ul class="rows">${rows.map(([t, w, s, x = ""]) => `<li><span class="t num">${t}</span><span class="what">${w}<span>${s}</span></span>${x}</li>`).join("")}</ul>`;
+
+  const G = ['<span class="who g">G</span>', "Grete, senior"], JO = ['<span class="who">J</span>', "Jonas, caregiver"];
+  const CL = [orb("idle", 1.75), "Claudia"];
+  const GP = "Grete's phone", JP = "Jonas's phone";
+  const ask8 = "Good morning, Grete. It's eight o'clock. Have you taken your morning tablets?";
+
+  const F = [
+    { name: "Set up the plan", title: "From prescription to reminders", steps: [
+      { who: JO, dev: JP, t: "Jonas sends the plan", why: "The doctor's Medikationsplan arrives by email or WhatsApp. Jonas forwards it to Claudia, or takes a photo. Setting it up by voice works too.", html: cCard("Claudia", `<div class="chat"><p class="bubble in">Hi Jonas, here is your mother's new Medikationsplan. Dr. Weber</p><div class="doc"><span class="ico">${ic("doc")}</span><span><b>Medikationsplan.pdf</b><span>Forwarded from email</span></span></div><p class="bubble">Please set this up for Mum.</p></div>`) },
+      { who: CL, dev: JP, t: "Claudia reads it", why: "Medicines, dose, what each pill looks like, and how many are in the box.", html: cCard("I found 3 medicines", `${plan}${tag("Pills in the box, as on the pack", "amber")}`), ex: true },
+      { who: CL, dev: JP, t: "Claudia asks right away", why: "She confirms what she sees and asks the follow-up questions herself.", html: cSay("I found three medicines. Shall I set up reminders for them? What time works best, and how many pills are in each box?") },
+      { who: JO, dev: JP, t: "Jonas answers", why: "One sentence covers times and stock.", html: hear("Yes. Eight in the morning and eight in the evening. The boxes are new."), ex: true },
+      { who: CL, dev: JP, t: "The plan is in the calendar", why: "Each intake time is a calendar event. Stock is counted from here on.", html: cCard("Tablet plan", `${tag("Reminders set")}<dl class="sum"><dt>8:00</dt><dd>Ramipril, Metformin, Vitamin D</dd><dt>20:00</dt><dd>Metformin</dd><dt>Stock</dt><dd>30 to 90 days</dd><dt>Grete hears</dt><dd>A ring at each time</dd></dl>`), ex: true },
+    ] },
+    { name: "Taken", title: "Morning tablets, taken", steps: [
+      { who: CL, dev: GP, t: "Claudia rings", why: "At the planned time Grete's phone rings, so the reminder isn't missed.", html: gRing("8:00", "Time for your morning tablets") },
+      { who: CL, dev: GP, t: "Claudia asks gently", why: "Three answers, by voice or with a button.", html: gCheck(ask8) },
+      { who: G, dev: GP, t: "Grete says yes", why: "A spoken answer is enough.", html: hear("Yes, I took them.") },
+      { who: CL, dev: GP, t: "Claudia confirms", why: "Intake is logged and the stock goes down by one.", html: gSay("Thank you, Grete. I've noted it.", "speaking", tag("Taken at 8:04")) },
+      { who: CL, dev: JP, t: "It's in the diary", why: "Jonas sees it when he looks. No message needed.", html: cCard("Diary, today", diary([["8:04", "Morning tablets", "Taken, Grete told Claudia", `<span class="tag">Done</span>`], ["8:00", "Claudia rang", "Answered after 1 ring"]]) + `<dl class="sum"><dt>Ramipril left</dt><dd class="num">29</dd></dl>`) },
+    ] },
+    { name: "Not at home", title: "Not at home right now", steps: [
+      { who: CL, dev: GP, t: "Claudia asks", why: "Same ring, same question.", html: gCheck(ask8, 1) },
+      { who: G, dev: GP, t: "Grete is out", why: "She answers by voice or taps Not at home.", html: hear("I'm not at home, I'm at the bakery.") },
+      { who: CL, dev: GP, t: "Claudia moves the reminder", why: "Later, at a time that suits her. No strike.", html: gSay("All right. I'll remind you again at ten, when you're back.", "speaking", tag("Postponed to 10:00, no strike", "mist")), ex: true },
+      { who: CL, dev: JP, t: "It's in the diary", why: "Jonas sees what happened and that nothing is wrong.", html: cCard("Diary, today", diary([["8:00", "Morning tablets", "Not at home, moved to 10:00"], ["10:00", "Claudia rings again", "Planned"]])), ex: true },
+    ] },
+    { name: "Forgot", title: "Forgot, and the 3 strikes", steps: [
+      { who: G, dev: GP, t: "Grete forgot", why: "Honest answers are welcome. By voice or with the Forgot button.", html: hear("Oh, I forgot them.") },
+      { who: CL, dev: GP, t: "Claudia counts a strike", why: "Calm, no blame. The strike counter goes up by one.", html: gSay("That's all right. Please take them now. I've noted it.", "speaking", strikes(1)) },
+      { who: CL, dev: JP, t: "Jonas sees the count", why: "One or two strikes stay in the diary. Nothing interrupts him yet.", html: cCard("Diary, this week", `${strikes(2)}${diary([["Wed", "Morning tablets", "Forgot, strike 2"], ["Mon", "Evening tablets", "Forgot, strike 1"], ["Mon", "Morning tablets", "Taken"]])}`), ex: true },
+      { who: CL, dev: JP, t: "Third strike: urgent alert", why: "At 3 strikes the family is alerted and the health status changes. When the counter resets is open.", html: `<div class="phone warn"><span class="tag" style="--dot:var(--ink)">Thursday, 8:12</span><div class="grow left"><p class="p-q">Grete forgot her tablets 3 times this week</p>${strikes(3)}<p>Health status: needs attention</p></div><span class="big">${ic("phone")}Call Grete</span><span class="big ghost">Open diary</span></div>`, ex: true },
+    ] },
+    { name: "Low stock", title: "Pills running out", steps: [
+      { who: CL, dev: JP, t: "Claudia warns Jonas", why: "Every Taken counts down the box. Close to empty, Jonas is told to book the doctor for a new prescription. The threshold is open.", html: lock("8:05", "Ramipril runs out in 5 days. Please book Dr. Weber for a new prescription."), ex: true },
+      { who: CL, dev: JP, t: "Claudia offers to book", why: "The next step is one tap: the appointment goes into the shared calendar.", html: cCard("Ramipril 5 mg", `${tag("5 left, about 5 days", "amber")}<dl class="sum"><dt>Prescribed by</dt><dd>Dr. Weber</dd><dt>Last box</dt><dd>30 pills, 1 per day</dd></dl><span class="big mid">Book Dr. Weber</span><span class="big mid ghost">Remind me tomorrow</span>`), ex: true },
+    ] },
+    { name: "Which pill?", title: "Which pill is this?", steps: [
+      { who: G, dev: GP, t: "Grete isn't sure", why: "She mixed up the boxes. One button on the tablet check: Which pill is this?", html: gCheck(ask8, null) },
+      { who: G, dev: GP, t: "She shows the box", why: "The camera opens. She holds up the box or blister.", html: gScan(false) },
+      { who: CL, dev: GP, t: "Claudia recognises it", why: "Matched against Grete's plan.", html: gScan(true), ex: true },
+      { who: CL, dev: GP, t: "Claudia reads it out", why: "What it is, what it's for and how to take it. The scan is logged in the diary.", html: gSay("This is Ramipril, five milligrams, for your blood pressure. Take one in the morning with a glass of water.") },
+    ] },
+  ];
+
+  let f = 0, i = 0;
+  const $ = (id) => document.getElementById(id);
+  const picker = $("picker");
+  picker.innerHTML = F.map((x, k) => `<button type="button" data-f="${k}"><span>${k + 1}</span>${x.name}</button>`).join("");
+  const render = () => {
+    const flow = F[f], s = flow.steps[i];
+    picker.querySelectorAll("button").forEach((b, k) => b.setAttribute("aria-pressed", k === f));
+    $("flow-title").textContent = flow.title;
+    $("count").textContent = `Flow ${f + 1} of ${F.length}, step ${i + 1} of ${flow.steps.length}`;
+    $("actor").innerHTML = s.who[0] + s.who[1];
+    $("step-title").textContent = s.t;
+    $("step-why").textContent = s.why;
+    $("example").hidden = !s.ex;
+    $("dev-label").textContent = s.dev;
+    document.querySelector(".device").dataset.theme = s.dev === GP ? "light" : "dark";
+    $("dev").innerHTML = s.html;
+    $("dots").innerHTML = flow.steps.map((_, k) => `<button type="button" data-k="${k}"${k === i ? ' aria-current="step"' : ""} aria-label="Step ${k + 1}">${k + 1}</button>`).join("");
+    $("prev").disabled = f === 0 && i === 0;
+    $("next").textContent = i < flow.steps.length - 1 ? "Next" : f < F.length - 1 ? "Next flow" : "Start over";
+    history.replaceState(null, "", `#${f + 1}-${i + 1}`);
+  };
+  const go = (nf, ni) => { f = nf; i = ni; render(); };
+  const next = () => (i < F[f].steps.length - 1 ? go(f, i + 1) : go((f + 1) % F.length, 0));
+  const prev = () => (i > 0 ? go(f, i - 1) : f > 0 ? go(f - 1, F[f - 1].steps.length - 1) : null);
+  picker.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) go(+b.dataset.f, 0); });
+  $("dots").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) go(f, +b.dataset.k); });
+  $("next").addEventListener("click", next);
+  $("prev").addEventListener("click", prev);
+  addEventListener("keydown", (e) => { if (e.key === "ArrowRight") next(); if (e.key === "ArrowLeft") prev(); });
+  const read = () => {
+    const m = location.hash.match(/^#(\d+)(?:-(\d+))?$/);
+    if (!m) return render();
+    const nf = Math.min(F.length, Math.max(1, +m[1])) - 1;
+    go(nf, Math.min(F[nf].steps.length, Math.max(1, +(m[2] || 1))) - 1);
+  };
+  addEventListener("hashchange", read);
+  read();
+})();
+</script>
+</body>
+</html>
