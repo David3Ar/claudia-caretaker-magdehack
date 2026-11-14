@@ -10,7 +10,7 @@
 ## Business
 
 **Idea:** voice-first agent for seniors (`G`) that supports daily routines and gives family caregivers (`C`) visibility and relief.
-Board title: *"To help regulate mental health of old people (Voice Agent)"*. Challenge: Pilotprojektsteckbrief #6 — mental health of family caregivers.
+Board title: *"To help regulate mental health of old people (Voice Agent)"*. Challenge: Pilot #6 — mental health of family caregivers.
 
 **Problem:** caregivers face long-term stress, isolation, no low-barrier support; senior often lives alone, caregiver is only lifeline.
 
@@ -25,7 +25,17 @@ Board title: *"To help regulate mental health of old people (Voice Agent)"*. Cha
 
 **Business model:** monthly subscription; add-ons (automatic pill purchase, delivery fees); delivery partnerships.
 
-**Sources:** `docs/PROJECT.md` (pitch brief), `docs/usm.md` (story map + MoSCoW), `docs/features/`, raw photos in `docs/todo/`.
+## Repo map
+
+| Path | Content |
+|---|---|
+| [`AGENTS.md`](AGENTS.md) | Agent instructions (this file) |
+| [`docs/project.md`](docs/project.md) | Pitch brief |
+| [`docs/user-story-map.md`](docs/user-story-map.md) | User story map + MoSCoW |
+| [`docs/features/01-calendar.md`](docs/features/01-calendar.md) | Feature 1 — Calendar / Scheduling |
+| [`docs/features/02-pill-checker.md`](docs/features/02-pill-checker.md) | Feature 2 — Pill Checker |
+| [`docs/features/03-live-location.md`](docs/features/03-live-location.md) | Feature 3 — Live Location + Emergency Alert |
+| [`docs/features/04-qa-setup.md`](docs/features/04-qa-setup.md) | Feature 4 — QA / Setup |
 
 ## Technical
 
