@@ -12,7 +12,7 @@
 /* Tokens and components follow docs/design.html. Page and player are the same as 01-calendar/flows.html */
 :root {
   --paper: #ffffff; --mist: #edf1ef; --ink: #000000; --ink-soft: #5c6662;
-  --lime: #c6f432; --amber: #ffb23e; --coral: #ff5a3c; --hair: rgb(0 0 0 / 0.12);
+  --grey: #8f9a95; --lime: #c6f432; --amber: #ffb23e; --coral: #ff5a3c; --hair: rgb(0 0 0 / 0.12);
   --sans: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
   --serif: Newsreader, Georgia, serif;
   --r-s: 0.75rem; --r-m: 1.5rem; --r-l: 2.75rem;
@@ -92,6 +92,8 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
 .p-hello { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
 .p-said { font-size: 1.5rem; line-height: 1.15; }
 .p-heard { font-size: 1.4375rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+.asked { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.015em; line-height: 1.2; color: var(--ink-soft); max-width: 16rem; }
+.phone.alarm .asked { color: rgb(0 0 0 / 0.7); }
 .p-q { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; }
 .listening { font-size: 0.9375rem; color: rgb(255 255 255 / 0.6); text-align: center; }
 .big { display: flex; align-items: center; justify-content: center; gap: 0.625rem; width: 100%; min-height: 4rem; padding: 0.75rem 1rem; border-radius: var(--r-m); background: var(--ink); color: var(--paper); font-size: 1.25rem; font-weight: 700; text-align: center; line-height: 1.1; flex: none; }
@@ -243,12 +245,13 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
   const say = (opts, lead = "Just say") => `<div class="say"><small>${lead}</small><div>${opts.map((o) => `<span>“${o}”</span>`).join("")}</div></div>`;
 
   // Grete: idle home keeps Call Jonas and Emergency as fallback. Once Claudia talks, nothing needs a tap.
-  const hear = (text) => `<div class="phone dark"><div class="grow">${orb("listening", 9.5)}<p class="p-heard">${text}</p></div><p class="listening">Listening, hands-free</p></div>`;
-  const gSay = (text, state = "speaking", extra = "") => `<div class="phone"><div class="grow">${orb(state, 7.5)}<p class="p-said said">${text}</p>${extra}</div>${fixed}</div>`;
-  const gVoice = (text, opts, state = "speaking", extra = "") => `<div class="phone"><div class="grow">${orb(state, 7.5)}<p class="p-said said">${text}</p>${extra}</div>${say(opts)}</div>`;
-  const gCalling = `<div class="phone"><div class="grow">${orb("speaking", 4.5)}<p class="p-said said">Calling Jonas.</p><span class="who xl">J</span><p class="p-hello">Ringing…</p></div>${say(["Hey Claudia, hang up"], "To stop")}</div>`;
+  // Whoever talks to Claudia appears above the orb; what Claudia says appears below it.
+  const hear = (text) => `<div class="phone dark"><div class="grow"><p class="p-heard">${text}</p>${orb("listening", 9.5)}</div><p class="listening">Listening, hands-free</p></div>`;
+  const gSay = (text, state = "speaking", extra = "", q = "") => `<div class="phone"><div class="grow">${q ? `<p class="asked">“${q}”</p>` : ""}${orb(state, 7.5)}<p class="p-said said">${text}</p>${extra}</div>${fixed}</div>`;
+  const gVoice = (text, opts, state = "speaking", extra = "", q = "") => `<div class="phone"><div class="grow">${q ? `<p class="asked">“${q}”</p>` : ""}${orb(state, 7.5)}<p class="p-said said">${text}</p>${extra}</div>${say(opts)}</div>`;
+  const gCalling = (q = "") => `<div class="phone"><div class="grow">${q ? `<p class="asked">“${q}”</p>` : ""}${orb("speaking", 4.5)}<p class="p-said said">Calling Jonas.</p><span class="who xl">J</span><p class="p-hello">Ringing…</p></div>${say(["Hey Claudia, hang up"], "To stop")}</div>`;
   const gOnCall = `<div class="phone dark"><div class="grow"><span class="who xl g">J</span><p class="p-hello">Talking to Jonas</p><p class="listening num">On speaker · 0:12</p></div>${say(["Hey Claudia, hang up"], "To end")}</div>`;
-  const gSos = (text, extra, opts) => `<div class="phone alarm"><div class="grow">${orb("speaking", 7.5)}<p class="p-said said">${text}</p>${extra}</div>${opts ? say(opts, "To cancel, say") : ""}</div>`;
+  const gSos = (text, extra, opts, q = "") => `<div class="phone alarm"><div class="grow">${q ? `<p class="asked">“${q}”</p>` : ""}${orb("speaking", 7.5)}<p class="p-said said">${text}</p>${extra}</div>${opts ? say(opts, "To cancel, say") : ""}</div>`;
 
   // Jonas
   const map = (place, sub, x, y, col = "#c6f432", alert = false) => `<div class="map" role="img" aria-label="Map: Grete at ${place}">
@@ -289,15 +292,15 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
 
   const F = [
     { name: "Where is Grete?", title: "Is Mum all right right now?", steps: [
-      { who: JO, dev: JP, t: "Jonas opens the app", why: "The first line answers his question. Grete left home at 10:32; no push was sent.", html: cToday("Grete is out", tag("Out since 10:32", "mist")) },
-      { who: JO, dev: JP, t: "He taps the pin", why: "Place name first, map second, today's places in order.", html: cMap("Bakery", "Since 10:40", 295, 82, tag("Out since 10:32", "mist"), [["8:00", "Home"], ["10:32", "Left home", "move"], ["10:40", "<b>Bakery</b>", "now"]]) },
+      { who: JO, dev: JP, t: "Jonas opens the app", why: "The first line answers his question. Grete left home at 10:32; no push was sent.", html: cToday("Grete is out", tag("Out since 10:32", "grey")) },
+      { who: JO, dev: JP, t: "He taps the pin", why: "Place name first, map second, today's places in order.", html: cMap("Bakery", "Since 10:40", 295, 82, tag("Out since 10:32", "grey"), [["8:00", "Home"], ["10:32", "Left home", "move"], ["10:40", "<b>Bakery</b>", "now"]]) },
       { who: CL, dev: JP, t: "Grete is back home", why: "The status turns lime by itself. Normal movement stays quiet: still no push.", html: cMap("Home", "Back from the bakery at 11:20", 180, 160, home, [["10:40", "Bakery"], ["11:12", "Walking home", "move"], ["11:20", "<b>Home</b>", "now"]]) },
       { who: JO, dev: WD, t: "The same on the dashboard", why: "A bigger map, the day in places, and who may see what. Settings are sentences about Claudia's behaviour.", html: dash, ex: true },
     ] },
     { name: "Where is my son?", title: "Where is my son?", steps: [
       { who: G, dev: GP, t: "Grete is in the kitchen", why: "The phone lies on the table. Claudia always listens for her name; the green dot shows it.", html: gSay("The doctor is at half past two.", "idle") },
       { who: G, dev: GP, t: "Grete asks", why: "Wake word and question in one breath. The screen turns black and shows her words. Nobody touched the phone.", html: hear("Hey Claudia, where is my son?") },
-      { who: CL, dev: GP, t: "Claudia answers", why: "Jonas allows it, so she hears “at work”, never an address. The screen shows what she can say, not buttons.", html: gVoice("Jonas is at work. Shall I ask him to call you?", ["Yes", "No, thanks"]) },
+      { who: CL, dev: GP, t: "Claudia answers", why: "Jonas allows it, so she hears “at work”, never an address. The screen shows what she can say, not buttons.", html: gVoice("Jonas is at work. Shall I ask him to call you?", ["Yes", "No, thanks"], "speaking", "", "Hey Claudia, where is my son?") },
       { who: G, dev: GP, t: "Grete says yes", why: "A spoken yes is enough.", html: hear("Yes, please.") },
       { who: CL, dev: JP, t: "Jonas gets one card", why: "One card, one action: Call Grete.", html: cToday("Grete is doing fine", home, note("Grete would like you to call", "She asked at 14:05", "Call Grete", "Later")) },
       { who: CL, dev: GP, t: "Claudia announces the call", why: "No ringing phone to find. Claudia says who it is.", html: gVoice("Jonas is calling. Shall I put him through?", ["Yes", "Not now"]) },
@@ -305,13 +308,13 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
     ] },
     { name: "Call Jonas", title: "Call my son, now", steps: [
       { who: G, dev: GP, t: "Grete asks for a call", why: "No message, no waiting: she wants to talk now.", html: hear("Hey Claudia, call Jonas.") },
-      { who: CL, dev: GP, t: "Claudia rings at once", why: "A direct command needs no question back. The Call Jonas button does the same.", html: gCalling },
+      { who: CL, dev: GP, t: "Claudia rings at once", why: "A direct command needs no question back. The Call Jonas button does the same.", html: gCalling("Hey Claudia, call Jonas.") },
       { who: JO, dev: JP, t: "Jonas sees Grete calling", why: "A normal incoming call, marked as coming through Claudia.", html: cIncoming },
       { who: G, dev: GP, t: "They talk on speaker", why: "Same call screen as when Jonas calls her.", html: gOnCall },
     ] },
     { name: "Help!", title: "Hey Claudia, help!", steps: [
       { who: G, dev: GP, t: "Grete has fallen", why: "The phone is on the kitchen table, out of reach. This is why she must never need it in her hand. The Emergency button starts the same flow.", html: hear("Hey Claudia, help!") },
-      { who: CL, dev: GP, t: "Claudia raises the alarm", why: "No confirm step. Her screen turns coral and Claudia tells her what happens.", html: gSos("I'm getting help. Jonas and Anna know. Stay where you are.", `<span class="tag inv" style="--dot:var(--coral)">Jonas and Anna told</span>`, ["I'm all right"]) },
+      { who: CL, dev: GP, t: "Claudia raises the alarm", why: "No confirm step. Her screen turns coral and Claudia tells her what happens.", html: gSos("I'm getting help. Jonas and Anna know. Stay where you are.", `<span class="tag inv" style="--dot:var(--coral)">Jonas and Anna told</span>`, ["I'm all right"], "Hey Claudia, help!") },
       { who: CL, dev: JP, t: "Every caregiver gets the alert", why: "Full screen, with what happened and where she is.", html: cAlert("10:42, just now", "Grete called for help", "She is at home, Breiter Weg 12. She said “Hey Claudia, help!”") },
       { who: JO, dev: JP, t: "Jonas is on his way", why: "One tap. Anna sees that Jonas is handling it. What happens if nobody responds is open.", html: cOnWay, ex: true },
       { who: CL, dev: GP, t: "Claudia tells Grete", why: "Right away, and she stays with her.", html: gSos("Jonas is on his way, Grete. I'm here with you.", `<span class="tag inv">Jonas is coming</span>`) },

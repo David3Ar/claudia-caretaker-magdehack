@@ -12,7 +12,7 @@
 /* Tokens and components follow docs/design.html. Page and player are the same as 01-calendar/flows.html */
 :root {
   --paper: #ffffff; --mist: #edf1ef; --ink: #000000; --ink-soft: #5c6662;
-  --lime: #c6f432; --amber: #ffb23e; --coral: #ff5a3c; --hair: rgb(0 0 0 / 0.12);
+  --grey: #8f9a95; --lime: #c6f432; --amber: #ffb23e; --coral: #ff5a3c; --hair: rgb(0 0 0 / 0.12);
   --sans: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
   --serif: Newsreader, Georgia, serif;
   --r-s: 0.75rem; --r-m: 1.5rem; --r-l: 2.75rem;
@@ -94,6 +94,7 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
 .p-said { font-size: 1.5rem; line-height: 1.15; }
 .p-said.sm { font-size: 1.25rem; }
 .p-heard { font-size: 1.4375rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+.asked { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.015em; line-height: 1.2; color: var(--ink-soft); max-width: 16rem; }
 .p-q { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; }
 .listening { font-size: 0.9375rem; color: rgb(255 255 255 / 0.6); text-align: center; }
 .clock { font-size: 3.5rem; font-weight: 700; letter-spacing: -0.05em; line-height: 1; text-align: center; margin-top: 1.5rem; }
@@ -237,8 +238,9 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
   const strikes = (n) => `<span class="strikes" role="img" aria-label="${n} of 3 strikes">${[0, 1, 2].map((k) => `<i class="${k < n ? "on" : ""}"></i>`).join("")}<span class="num">${n}/3</span></span>`;
 
   // Grete
-  const hear = (text) => `<div class="phone dark"><div class="grow">${orb("listening", 9.5)}<p class="p-heard">${text}</p></div><p class="listening">Listening</p></div>`;
-  const gSay = (text, state = "speaking", extra = "") => `<div class="phone"><div class="grow">${orb(state, 7.5)}<p class="p-said said">${text}</p>${extra}</div><span class="big">${ic("phone")}Call Jonas</span><span class="big sos">Emergency</span></div>`;
+  // Whoever talks to Claudia appears above the orb; what Claudia says appears below it.
+  const hear = (text) => `<div class="phone dark"><div class="grow"><p class="p-heard">${text}</p>${orb("listening", 9.5)}</div><p class="listening">Listening</p></div>`;
+  const gSay = (text, state = "speaking", extra = "", q = "") => `<div class="phone"><div class="grow">${q ? `<p class="asked">“${q}”</p>` : ""}${orb(state, 7.5)}<p class="p-said said">${text}</p>${extra}</div><span class="big">${ic("phone")}Call Jonas</span><span class="big sos">Emergency</span></div>`;
   const gRing = (time, what) => `<div class="phone dark"><p class="clock num">${time}</p><div class="grow"><div class="ringing">${orb("idle", 7)}<p class="p-hello">Claudia is calling</p><p class="listening">${what}</p></div></div><span class="big yes">${ic("phone")}Answer</span></div>`;
   const choose = (on) => { const b = (k, cls, t) => `<span class="big mid ${cls}${on === k ? " on" : ""}">${t}</span>`; return `<div class="choice">${b(0, "yes", "Taken")}${b(1, "ghost", "Not at home")}${b(2, "ghost", "Forgot")}</div><p class="or">or just say it</p>`; };
   const gCheck = (text, on, extra = "") => `<div class="phone"><div class="grow left">${orb("speaking", 4)}<p class="p-said said">${text}</p>${extra}</div>${choose(on)}<span class="big ghost mid">${ic("cam")}Which pill is this?</span></div>`;
@@ -269,18 +271,18 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
       { who: CL, dev: GP, t: "Claudia rings", why: "At the planned time Grete's phone rings, so the reminder isn't missed.", html: gRing("8:00", "Time for your morning tablets") },
       { who: CL, dev: GP, t: "Claudia asks gently", why: "Three answers, by voice or with a button.", html: gCheck(ask8) },
       { who: G, dev: GP, t: "Grete says yes", why: "A spoken answer is enough.", html: hear("Yes, I took them.") },
-      { who: CL, dev: GP, t: "Claudia confirms", why: "Intake is logged and the stock goes down by one.", html: gSay("Thank you, Grete. I've noted it.", "speaking", tag("Taken at 8:04")) },
+      { who: CL, dev: GP, t: "Claudia confirms", why: "Intake is logged and the stock goes down by one.", html: gSay("Thank you, Grete. I've noted it.", "speaking", tag("Taken at 8:04"), "Yes, I took them.") },
       { who: CL, dev: JP, t: "It's in the diary", why: "Jonas sees it when he looks. No message needed.", html: cCard("Diary, today", diary([["8:04", "Morning tablets", "Taken, Grete told Claudia", `<span class="tag">Done</span>`], ["8:00", "Claudia rang", "Answered after 1 ring"]]) + `<dl class="sum"><dt>Ramipril left</dt><dd class="num">29</dd></dl>`) },
     ] },
     { name: "Not at home", title: "Not at home right now", steps: [
       { who: CL, dev: GP, t: "Claudia asks", why: "Same ring, same question.", html: gCheck(ask8, 1) },
       { who: G, dev: GP, t: "Grete is out", why: "She answers by voice or taps Not at home.", html: hear("I'm not at home, I'm at the bakery.") },
-      { who: CL, dev: GP, t: "Claudia moves the reminder", why: "Later, at a time that suits her. No strike.", html: gSay("All right. I'll remind you again at ten, when you're back.", "speaking", tag("Postponed to 10:00, no strike", "mist")), ex: true },
+      { who: CL, dev: GP, t: "Claudia moves the reminder", why: "Later, at a time that suits her. No strike.", html: gSay("All right. I'll remind you again at ten, when you're back.", "speaking", tag("Postponed to 10:00, no strike", "grey"), "I'm not at home, I'm at the bakery."), ex: true },
       { who: CL, dev: JP, t: "It's in the diary", why: "Jonas sees what happened and that nothing is wrong.", html: cCard("Diary, today", diary([["8:00", "Morning tablets", "Not at home, moved to 10:00"], ["10:00", "Claudia rings again", "Planned"]])), ex: true },
     ] },
     { name: "Forgot", title: "Forgot, and the 3 strikes", steps: [
       { who: G, dev: GP, t: "Grete forgot", why: "Honest answers are welcome. By voice or with the Forgot button.", html: hear("Oh, I forgot them.") },
-      { who: CL, dev: GP, t: "Claudia counts a strike", why: "Calm, no blame. The strike counter goes up by one.", html: gSay("That's all right. Please take them now. I've noted it.", "speaking", strikes(1)) },
+      { who: CL, dev: GP, t: "Claudia counts a strike", why: "Calm, no blame. The strike counter goes up by one.", html: gSay("That's all right. Please take them now. I've noted it.", "speaking", strikes(1), "Oh, I forgot them.") },
       { who: CL, dev: JP, t: "Jonas sees the count", why: "One or two strikes stay in the diary. Nothing interrupts him yet.", html: cCard("Diary, this week", `${strikes(2)}${diary([["Wed", "Morning tablets", "Forgot, strike 2"], ["Mon", "Evening tablets", "Forgot, strike 1"], ["Mon", "Morning tablets", "Taken"]])}`), ex: true },
       { who: CL, dev: JP, t: "Third strike: urgent alert", why: "At 3 strikes the family is alerted and the health status changes. When the counter resets is open.", html: `<div class="phone warn"><span class="tag" style="--dot:var(--ink)">Thursday, 8:12</span><div class="grow left"><p class="p-q">Grete forgot her tablets 3 times this week</p>${strikes(3)}<p>Health status: needs attention</p></div><span class="big">${ic("phone")}Call Grete</span><span class="big ghost">Open diary</span></div>`, ex: true },
     ] },

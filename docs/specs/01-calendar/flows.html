@@ -12,7 +12,7 @@
 /* Tokens and components follow docs/design.html */
 :root {
   --paper: #ffffff; --mist: #edf1ef; --ink: #000000; --ink-soft: #5c6662;
-  --lime: #c6f432; --amber: #ffb23e; --coral: #ff5a3c; --hair: rgb(0 0 0 / 0.12);
+  --grey: #8f9a95; --lime: #c6f432; --amber: #ffb23e; --coral: #ff5a3c; --hair: rgb(0 0 0 / 0.12);
   --sans: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
   --serif: Newsreader, Georgia, serif;
   --r-s: 0.75rem; --r-m: 1.5rem; --r-l: 2.75rem;
@@ -91,6 +91,7 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
 .p-hello { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
 .p-said { font-size: 1.5rem; line-height: 1.15; }
 .p-heard { font-size: 1.4375rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+.asked { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.015em; line-height: 1.2; color: var(--ink-soft); max-width: 16rem; }
 .listening { font-size: 0.9375rem; color: rgb(255 255 255 / 0.6); text-align: center; }
 .clock { font-size: 3.5rem; font-weight: 700; letter-spacing: -0.05em; line-height: 1; text-align: center; margin-top: 1.5rem; }
 .push { display: grid; gap: 0.25rem; padding: 0.875rem 1rem; border-radius: var(--r-m); background: var(--paper); line-height: 1.25; text-align: left; box-shadow: 0 0 0 2px var(--ink); }
@@ -242,8 +243,9 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
   const tag = (t, dot) => `<span class="tag"${dot ? ` style="--dot:var(--${dot})"` : ""}>${t}</span>`;
 
   // Screens
-  const hear = (text) => `<div class="phone dark"><div class="grow">${orb("listening", 9.5)}<p class="p-heard">${text}</p></div><p class="listening">Listening</p></div>`;
-  const gSay = (text, state = "speaking", extra = "") => `<div class="phone"><div class="grow">${orb(state, 7.5)}<p class="p-said said">${text}</p>${extra}</div>${fixed}</div>`;
+  // Whoever talks to Claudia appears above the orb; what Claudia says appears below it.
+  const hear = (text) => `<div class="phone dark"><div class="grow"><p class="p-heard">${text}</p>${orb("listening", 9.5)}</div><p class="listening">Listening</p></div>`;
+  const gSay = (text, state = "speaking", extra = "", q = "") => `<div class="phone"><div class="grow">${q ? `<p class="asked">“${q}”</p>` : ""}${orb(state, 7.5)}<p class="p-said said">${text}</p>${extra}</div>${fixed}</div>`;
   const gAsk = (text, yes, no) => `<div class="phone"><div class="grow left">${orb("speaking", 4.5)}<p class="p-said said">${text}</p></div><span class="big yes">${yes}</span><span class="big ghost">${no}</span><span class="big sos">Emergency</span></div>`;
   const cSay = (text, extra = "", state = "speaking") => `<div class="phone"><div class="grow">${orb(state, 6.5)}<p class="p-said said">${text}</p>${extra}</div>${tabbar}</div>`;
   const cAsk = (text, yes, no, extra = "") => `<div class="phone"><div class="grow left">${orb("speaking", 4)}<p class="p-said said" style="font-size:1.3125rem">${text}</p>${extra}</div><span class="big mid yes">${yes}</span><span class="big mid ghost">${no}</span></div>`;
@@ -255,7 +257,7 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
   const day = (n, d, evs = "", now = false) => `<div class="day${now ? " now" : ""}"><h5>${now ? "Today" : n}<b class="num">${d}</b></h5>${evs}</div>`;
   const week = (days) => `<div class="week-scroll"><div class="wk">${days.join("")}</div></div>`;
   const cal = (title, body, legend = "") => `<div class="screen"><div class="calendar"><div class="cal-top"><h3>${title}</h3>${legend}</div>${body}</div></div>`;
-  const legend = `<p class="legend"><span style="--c:var(--lime)">Took place</span><span style="--c:var(--amber)">Rescheduled</span><span style="--c:var(--coral)">Missed</span><span style="--c:var(--mist)">Planned</span></p>`;
+  const legend = `<p class="legend"><span style="--c:var(--lime)">Took place</span><span style="--c:var(--amber)">Rescheduled</span><span style="--c:var(--coral)">Missed</span><span style="--c:var(--grey)">Planned</span></p>`;
 
   const dentistWeek = (who, by) => week([
     day("Mon", 19, ev("10:00", "Physio", A + "Anna drives")),
@@ -285,7 +287,7 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
       day("Sat", 17, ev("15:00", "Coffee with Helga", "At home")),
       day("Sun", 18),
     ])}`;
-  const detail = (mark) => `<div class="one">${tag("Planned", "mist")}<h4>Dentist</h4><dl>
+  const detail = (mark) => `<div class="one">${tag("Planned", "grey")}<h4>Dentist</h4><dl>
     <dt>When</dt><dd>Thu 15 Nov, 10:30</dd>
     <dt>Where</dt><dd>Zahnarztpraxis</dd>
     <dt>Assigned</dt><dd>${J}Jonas</dd>
@@ -304,8 +306,8 @@ svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-
   const F = [
     { name: "Next appointment", title: "When is my next dentist appointment?", steps: [
       { who: G, dev: GP, t: "Grete asks", why: "She says it out loud. The screen turns black and shows her words.", html: hear("Hey Claudia, when is my next dentist appointment, and who could bring me?") },
-      { who: CL, dev: GP, t: "Claudia checks", why: "She looks in the shared calendar.", html: gSay("Let me check.", "thinking") },
-      { who: CL, dev: GP, t: "Claudia answers", why: "Exact date and time, and who already accepted.", html: gSay("Friday, 23 November at 10:30. Your son Jonas already accepted and will bring you.") },
+      { who: CL, dev: GP, t: "Claudia checks", why: "She looks in the shared calendar.", html: gSay("Let me check.", "thinking", "", "Hey Claudia, when is my next dentist appointment, and who could bring me?") },
+      { who: CL, dev: GP, t: "Claudia answers", why: "Exact date and time, and who already accepted.", html: gSay("Friday, 23 November at 10:30. Your son Jonas already accepted and will bring you.", "speaking", "", "Hey Claudia, when is my next dentist appointment, and who could bring me?") },
       { who: CL, dev: GP, t: "Claudia offers reminders", why: "One question, answered by voice or with a button.", html: gAsk("I'll remind you three days in advance and the day before. Is that okay?", "Yes, that's fine", "No") },
       { who: G, dev: GP, t: "Grete confirms", why: "A spoken yes is enough.", html: hear("Yes, that's fine.") },
       { who: CL, dev: FC, t: "Reminders are saved", why: "The family sees the appointment, who brings Grete, and both reminders.", html: cal("19 to 25 November", dentistWeek(J, "Jonas brings her")) },

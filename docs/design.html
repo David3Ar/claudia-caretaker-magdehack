@@ -122,7 +122,10 @@ button.orb { border: 0; background: none; padding: 0; }
 .stage { position: relative; border-radius: var(--r-l); background: var(--ink); color: var(--paper); padding: clamp(1.5rem, 4vw, 3rem); display: grid; justify-items: center; gap: clamp(1.5rem, 3vw, 2.5rem); overflow: hidden; text-align: center; }
 .stage .orb { --s: clamp(11rem, 26vw, 19rem); margin: clamp(1rem, 3vw, 2.5rem) 0; }
 .stage-line { min-height: 2.3em; font-size: clamp(1.5rem, 3.2vw, 2.5rem); line-height: 1.15; max-width: 22ch; }
-.stage-line.heard { font-family: var(--sans); font-style: normal; font-weight: 500; letter-spacing: -0.02em; }
+.stage-heard { min-height: 1.2em; font-size: clamp(1.25rem, 2.6vw, 2rem); line-height: 1.15; max-width: 24ch; font-weight: 500; letter-spacing: -0.02em; transition: opacity 0.3s; }
+.stage-heard.past { opacity: 0.55; }
+/* Whoever talks to Claudia appears above the orb; what Claudia says appears below it. */
+.asked { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.015em; line-height: 1.2; color: var(--ink-soft); }
 .seg { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.25rem; padding: 0.375rem; border-radius: 1.75rem; background: rgb(255 255 255 / 0.14); }
 .seg button { border: 0; background: none; color: var(--paper); padding: 0.625rem 1.25rem; border-radius: 99rem; font-weight: 500; }
 .seg button[aria-pressed="true"] { background: var(--paper); color: var(--ink); }
@@ -471,14 +474,15 @@ button.orb { border: 0; background: none; padding: 0; }
               <button type="button" data-set="thinking" aria-pressed="false">Thinking</button>
               <button type="button" data-set="speaking" aria-pressed="true">Speaking</button>
             </div>
+            <p class="stage-heard past" id="stage-heard" aria-live="polite">Where is my son?</p>
             <div class="orb" id="stage-orb" data-state="speaking" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
             <p class="stage-line said" id="stage-line" aria-live="polite">Jonas is at work. Shall I ask him to call you?</p>
           </div>
           <ul class="states">
             <li><div class="orb" data-state="idle" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div><b>Waiting</b><span>Halo turns slowly. Say "Claudia" or touch the orb.</span></li>
-            <li><div class="orb" data-state="listening" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div><b>Listening</b><span>Halo widens and breathes. Your words appear in plain type.</span></li>
+            <li><div class="orb" data-state="listening" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div><b>Listening</b><span>Halo widens and breathes. Your words appear above the orb, in plain type.</span></li>
             <li><div class="orb" data-state="thinking" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div><b>Thinking</b><span>Halo spins fast, dots hop. Never longer than a breath.</span></li>
-            <li><div class="orb" data-state="speaking" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div><b>Speaking</b><span>Bars move with her voice. Her words appear in italic.</span></li>
+            <li><div class="orb" data-state="speaking" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div><b>Speaking</b><span>Bars move with her voice. Her words appear below the orb, in italic.</span></li>
           </ul>
         </div>
       </div>
@@ -511,12 +515,12 @@ button.orb { border: 0; background: none; padding: 0; }
             <figure>
               <div class="phone dark">
                 <div class="grow">
-                  <div class="orb" data-state="listening" style="--s:9.5rem" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
                   <p class="p-heard">Where is my son?</p>
+                  <div class="orb" data-state="listening" style="--s:9.5rem" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
                 </div>
                 <span class="big ghost" style="background:none;color:var(--paper);box-shadow:inset 0 0 0 2px var(--paper)">Stop listening</span>
               </div>
-              <figcaption><b>Listening</b>The screen turns black while Grete talks. Her words appear as she says them.</figcaption>
+              <figcaption><b>Listening</b>The screen turns black while Grete talks. Her words appear above the orb as she says them.</figcaption>
             </figure>
             <figure>
               <div class="phone">
@@ -533,6 +537,7 @@ button.orb { border: 0; background: none; padding: 0; }
             <figure>
               <div class="phone">
                 <div class="grow">
+                  <p class="asked">“Where is my son?”</p>
                   <div class="orb" data-state="speaking" style="--s:7.5rem" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
                   <p class="p-said said">Jonas is at work. I've asked him to call you.</p>
                   <span class="tag ok">Message sent to Jonas</span>
@@ -540,7 +545,7 @@ button.orb { border: 0; background: none; padding: 0; }
                 <span class="big"><svg class="i"><use href="#i-phone"/></svg>Call Jonas</span>
                 <span class="big sos">Emergency</span>
               </div>
-              <figcaption><b>Answer</b>What Claudia did is confirmed in one short line under what she said.</figcaption>
+              <figcaption><b>Answer</b>Her question stays above the orb, Claudia's answer below. What Claudia did is confirmed in one short line under it.</figcaption>
             </figure>
           </div>
         </div>
@@ -822,19 +827,22 @@ button.orb { border: 0; background: none; padding: 0; }
 
 <script>
 (() => {
+  // [above the orb: what Grete said, below the orb: what Claudia says]
   const lines = {
-    idle: ["said", "Say “Claudia” when you need me."],
-    listening: ["heard", "Where is my son?"],
-    thinking: ["said", " "],
-    speaking: ["said", "Jonas is at work. Shall I ask him to call you?"],
+    idle: ["", "Say “Claudia” when you need me."],
+    listening: ["Where is my son?", ""],
+    thinking: ["Where is my son?", ""],
+    speaking: ["Where is my son?", "Jonas is at work. Shall I ask him to call you?"],
   };
   const order = Object.keys(lines);
   const stageOrb = document.getElementById("stage-orb");
   const line = document.getElementById("stage-line");
+  const heard = document.getElementById("stage-heard");
   const heroOrb = document.querySelector(".hero .orb");
   const setStage = (s) => {
     stageOrb.dataset.state = s;
-    line.className = "stage-line " + lines[s][0];
+    heard.textContent = lines[s][0];
+    heard.classList.toggle("past", s === "speaking");
     line.textContent = lines[s][1];
     document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.set === s));
   };
