@@ -1,0 +1,821 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claudia Design</title>
+<meta name="description" content="Design language for Claudia, the voice-first companion for seniors and their family caregivers: colour, type, voice mode, both apps and the web dashboard.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@300;400;500;600;700;800&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500&display=swap">
+<style>
+/* Six colours. Lime, amber and coral are the status scale and the voice halo; nothing else is coloured. */
+:root {
+  --paper: #ffffff;
+  --mist: #edf1ef;
+  --ink: #000000;
+  --ink-soft: #5c6662;
+  --lime: #c6f432;
+  --amber: #ffb23e;
+  --coral: #ff5a3c;
+  --hair: rgb(0 0 0 / 0.12);
+  --sans: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: Newsreader, Georgia, serif;
+  --r-s: 0.75rem;
+  --r-m: 1.5rem;
+  --r-l: 2.75rem;
+  --pad: clamp(1.25rem, 4vw, 4rem);
+  --max: 90rem;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; font-family: var(--sans); color: var(--ink); background: var(--paper); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4, p, figure, ul, ol, dl, dd { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--pad); }
+.soft { color: var(--ink-soft); }
+.num { font-variant-numeric: tabular-nums; }
+/* Everything the agent says aloud is set in the serif italic. Everything else is sans. */
+.said { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* Page header */
+.top { position: sticky; top: 0.75rem; z-index: 30; display: flex; justify-content: center; padding: 0 var(--pad); pointer-events: none; }
+.top nav { pointer-events: auto; display: flex; align-items: center; gap: 0.25rem; padding: 0.375rem; border-radius: 99rem; background: var(--ink); color: var(--paper); font-size: 0.9375rem; max-width: 100%; overflow-x: auto; }
+.top a { color: inherit; text-decoration: none; padding: 0.375rem 0.875rem; border-radius: 99rem; white-space: nowrap; }
+.top a:hover { background: rgb(255 255 255 / 0.16); }
+.top a.mark { font-weight: 700; letter-spacing: -0.02em; }
+
+/* Hero */
+.hero { padding: clamp(3rem, 8vw, 6rem) 0 clamp(3rem, 8vw, 6rem); overflow: hidden; }
+.hero-word { position: relative; }
+.hero h1 { font-size: clamp(4.25rem, 20.5vw, 20rem); font-weight: 800; line-height: 0.8; letter-spacing: -0.065em; margin-left: -0.04em; }
+.hero .orb { position: absolute; right: -1%; bottom: 0; --s: clamp(4.5rem, 17vw, 16rem); }
+.hero-said { margin-top: clamp(3.5rem, 8vw, 7rem); font-size: clamp(1.75rem, 4.2vw, 3.75rem); line-height: 1.08; max-width: 20ch; }
+.hero-meta { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem; margin-top: clamp(2.5rem, 5vw, 4rem); padding-top: 1.5rem; border-top: 2px solid var(--ink); }
+.hero-meta p { grid-column: span 6; font-size: clamp(1.125rem, 1.7vw, 1.375rem); line-height: 1.4; max-width: 38ch; }
+.hero-meta dl { grid-column: 8 / span 5; display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1.5rem; align-content: start; }
+.hero-meta dt { color: var(--ink-soft); }
+
+/* Sections: sticky title column left, content right */
+.sec { padding: clamp(4rem, 9vw, 8rem) 0; border-top: 1px solid var(--hair); }
+.sec > .wrap { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem; }
+.sec-head { grid-column: 1 / span 4; align-self: start; position: sticky; top: 5rem; }
+.sec-head h2 { font-size: clamp(2.5rem, 5.2vw, 4.75rem); font-weight: 700; line-height: 0.95; letter-spacing: -0.045em; }
+.sec-head p { margin-top: 1.25rem; max-width: 32ch; color: var(--ink-soft); font-size: 1.0625rem; }
+.sec-body { grid-column: 5 / span 8; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(3rem, 6vw, 5rem); }
+.sec-body > * { min-width: 0; }
+.sub h3 { font-size: 1.375rem; font-weight: 600; letter-spacing: -0.015em; }
+.sub > p { margin: 0.25rem 0 1.5rem; max-width: 62ch; color: var(--ink-soft); }
+.cap { margin-top: 0.875rem; font-size: 0.9375rem; color: var(--ink-soft); max-width: 62ch; }
+
+/* The voice orb: a black pearl with a halo in the status colours */
+.orb { --s: 10rem; position: relative; width: var(--s); height: var(--s); flex: none; border-radius: 50%; display: grid; place-items: center; isolation: isolate; }
+.orb::before { content: ""; position: absolute; inset: 0; z-index: -2; border-radius: 50%; background: conic-gradient(var(--lime), var(--amber), var(--coral), var(--amber), var(--lime)); filter: blur(calc(var(--s) * 0.055)); animation: spin 14s linear infinite; }
+.orb::after { content: ""; position: absolute; inset: 7%; z-index: -1; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #2a2a2a, #000 62%); transition: inset 0.5s cubic-bezier(0.2, 0.7, 0.2, 1); }
+button.orb { border: 0; background: none; padding: 0; }
+.bars { display: flex; align-items: center; gap: calc(var(--s) * 0.045); height: calc(var(--s) * 0.32); transition: opacity 0.3s; }
+.bars i { width: calc(var(--s) * 0.055); height: 100%; border-radius: 99rem; background: var(--paper); transform: scaleY(0.17); }
+.orb[data-state="idle"] .bars { opacity: 0.35; }
+.orb[data-state="listening"]::after { inset: 13%; }
+.orb[data-state="listening"]::before { animation: spin 14s linear infinite, breathe 1.6s ease-in-out infinite; }
+.orb[data-state="thinking"]::before { animation-duration: 2.2s; }
+.orb[data-state="thinking"]::after { inset: 4%; }
+.orb[data-state="thinking"] .bars i { animation: hop 0.9s ease-in-out infinite; }
+.orb[data-state="speaking"] .bars i { animation: talk 0.7s ease-in-out infinite alternate; }
+.bars i:nth-child(2) { animation-delay: -0.45s !important; }
+.bars i:nth-child(3) { animation-delay: -0.2s !important; }
+.bars i:nth-child(4) { animation-delay: -0.6s !important; }
+.bars i:nth-child(5) { animation-delay: -0.3s !important; }
+@keyframes spin { to { rotate: 1turn; } }
+@keyframes breathe { 50% { scale: 1.09; } }
+@keyframes talk { from { transform: scaleY(0.2); } to { transform: scaleY(1); } }
+@keyframes hop { 0%, 100% { transform: scaleY(0.17) translateY(0); } 50% { transform: scaleY(0.17) translateY(-160%); } }
+
+/* Principles */
+.rules { border-top: 2px solid var(--ink); }
+.rules li { display: grid; grid-template-columns: 1fr 1.4fr; gap: 1.5rem; padding: 1.5rem 0; border-bottom: 1px solid var(--hair); }
+.rules h3 { font-size: clamp(1.5rem, 2.6vw, 2.25rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; }
+.rules p { color: var(--ink-soft); max-width: 46ch; }
+
+/* Colour */
+.swatches { border-top: 2px solid var(--ink); }
+.swatches li { display: grid; grid-template-columns: 5.5rem 8rem 6rem 1fr; align-items: center; gap: 1.5rem; padding: 1rem 0; border-bottom: 1px solid var(--hair); }
+.chip { display: block; height: 3.5rem; border-radius: var(--r-s); }
+.chip.line { box-shadow: inset 0 0 0 1px var(--hair); }
+.tok { font-weight: 600; }
+.scale3 { display: grid; grid-template-columns: repeat(3, 1fr); border-radius: var(--r-m); overflow: hidden; }
+.scale3 div { padding: 1.5rem; min-height: 11rem; display: flex; flex-direction: column; justify-content: space-between; gap: 1.5rem; }
+.scale3 b { font-size: 1.5rem; letter-spacing: -0.02em; }
+
+/* Type */
+.glyphs { font-size: clamp(2.5rem, 6vw, 5.5rem); font-weight: 300; letter-spacing: -0.03em; line-height: 1.05; overflow-wrap: anywhere; }
+.tscale { border-top: 2px solid var(--ink); }
+.tscale > div { display: grid; grid-template-columns: 13rem 1fr; gap: 1.5rem; align-items: baseline; padding: 1.25rem 0; border-bottom: 1px solid var(--hair); }
+.tscale dt { font-weight: 600; }
+.tscale dt span { display: block; font-weight: 400; color: var(--ink-soft); font-size: 0.9375rem; }
+.tscale dd { min-width: 0; overflow-wrap: anywhere; }
+
+/* Voice stage */
+.stage { position: relative; border-radius: var(--r-l); background: var(--ink); color: var(--paper); padding: clamp(1.5rem, 4vw, 3rem); display: grid; justify-items: center; gap: clamp(1.5rem, 3vw, 2.5rem); overflow: hidden; text-align: center; }
+.stage .orb { --s: clamp(11rem, 26vw, 19rem); margin: clamp(1rem, 3vw, 2.5rem) 0; }
+.stage-line { min-height: 2.3em; font-size: clamp(1.5rem, 3.2vw, 2.5rem); line-height: 1.15; max-width: 22ch; }
+.stage-line.heard { font-family: var(--sans); font-style: normal; font-weight: 500; letter-spacing: -0.02em; }
+.seg { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.25rem; padding: 0.375rem; border-radius: 1.75rem; background: rgb(255 255 255 / 0.14); }
+.seg button { border: 0; background: none; color: var(--paper); padding: 0.625rem 1.25rem; border-radius: 99rem; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--paper); color: var(--ink); }
+.seg button:focus-visible { outline-color: var(--lime); }
+.states { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 2rem; }
+.states li { display: grid; gap: 0.75rem; justify-items: start; align-content: start; }
+.states .orb { --s: 4.5rem; }
+.states b { font-size: 1.125rem; }
+.states span { color: var(--ink-soft); font-size: 0.9375rem; }
+
+/* Phones: a thin outline, nothing more */
+.phones { display: flex; flex-wrap: wrap; gap: clamp(1.5rem, 3vw, 2.5rem); }
+.phones figure { display: grid; gap: 1rem; width: 17rem; max-width: 100%; }
+.phones.three figure { width: 15.25rem; }
+.phones figcaption { font-size: 0.9375rem; color: var(--ink-soft); }
+.phones figcaption b { display: block; color: var(--ink); font-size: 1rem; }
+.phone { aspect-ratio: 9 / 18.5; border: 2px solid var(--ink); border-radius: var(--r-l); background: var(--paper); padding: 1.25rem 1rem 1rem; display: flex; flex-direction: column; gap: 0.875rem; overflow: hidden; position: relative; }
+.phone::before { content: ""; align-self: center; width: 4.5rem; height: 1.125rem; border-radius: 99rem; background: var(--ink); flex: none; }
+.phone.dark { background: var(--ink); color: var(--paper); }
+.phone.dark::before { background: #262626; }
+.phone.alarm { background: var(--coral); }
+.phone .grow { flex: 1; display: grid; place-items: center; align-content: center; gap: 1.25rem; text-align: center; min-height: 0; }
+.p-hello { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+.p-said { font-size: 1.4375rem; line-height: 1.15; }
+.p-heard { font-size: 1.375rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+.p-q { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; text-align: left; }
+.p-small { font-size: 0.875rem; }
+
+/* Components */
+.big { display: flex; align-items: center; justify-content: center; gap: 0.625rem; width: 100%; min-height: 4rem; padding: 0.75rem 1rem; border: 0; border-radius: var(--r-m); background: var(--ink); color: var(--paper); font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em; text-align: center; }
+.big.sos { background: var(--coral); color: var(--ink); }
+.big.yes { background: var(--lime); color: var(--ink); }
+.big.ghost { background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); }
+.phone.alarm .big.ghost { background: transparent; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 2.75rem; padding: 0 1.25rem; border: 0; border-radius: 99rem; background: var(--ink); color: var(--paper); font-weight: 600; white-space: nowrap; }
+.btn.line { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.btn.sm { min-height: 2.25rem; padding: 0 0.875rem; font-size: 0.9375rem; }
+.tag { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 99rem; background: var(--mist); font-size: 0.9375rem; font-weight: 500; white-space: nowrap; }
+.tag::before { content: ""; width: 0.625rem; height: 0.625rem; border-radius: 50%; background: var(--dot, var(--ink-soft)); }
+.tag.ok { --dot: var(--lime); box-shadow: inset 0 0 0 1px var(--hair); background: var(--paper); }
+.tag.ok::before { box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35); }
+.tag.wait { --dot: var(--amber); }
+.tag.alert { background: var(--coral); --dot: var(--ink); }
+.who { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 0.8125rem; font-weight: 700; flex: none; }
+.who.b { background: var(--mist); color: var(--ink); box-shadow: inset 0 0 0 1px var(--hair); }
+.who.none { background: none; color: var(--ink); border: 1.5px dashed var(--ink); }
+.rows li { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid var(--hair); }
+.rows li:last-child { border-bottom: 0; }
+.rows .t { width: 3.25rem; flex: none; font-weight: 600; }
+.rows .what { flex: 1; min-width: 0; line-height: 1.25; }
+.rows .what span { display: block; color: var(--ink-soft); font-size: 0.875rem; }
+.switch { position: relative; width: 3rem; height: 1.75rem; flex: none; border: 0; padding: 0; border-radius: 99rem; background: #c3cbc7; transition: background 0.2s; }
+.switch::after { content: ""; position: absolute; top: 0.1875rem; left: 0.1875rem; width: 1.375rem; height: 1.375rem; border-radius: 50%; background: var(--paper); transition: translate 0.2s; }
+.switch[aria-checked="true"] { background: var(--ink); }
+.switch[aria-checked="true"]::after { translate: 1.25rem 0; }
+.field { display: grid; gap: 0.25rem; font-size: 0.875rem; color: var(--ink-soft); }
+.field b { display: flex; align-items: center; min-height: 2.75rem; padding: 0 0.875rem; border-radius: var(--r-s); background: var(--mist); color: var(--ink); font-size: 1rem; font-weight: 500; }
+.pick { display: flex; gap: 0.5rem; }
+.pick span { flex: 1; display: grid; justify-items: center; gap: 0.25rem; padding: 0.625rem 0.25rem; border-radius: var(--r-s); background: var(--mist); color: var(--ink); font-size: 0.8125rem; line-height: 1.2; text-align: center; }
+.pick span.on { background: var(--ink); color: var(--paper); }
+.pick span.on .who { background: var(--lime); color: var(--ink); }
+.tabbar { display: flex; align-items: center; justify-content: space-between; padding: 0 0.75rem; margin-top: auto; }
+.tabbar .mic { display: grid; place-items: center; width: 3.75rem; height: 3.75rem; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 1.25rem; }
+.tabbar .side { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--mist); }
+.kit { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--hair); border-radius: var(--r-m); }
+.kit .big { width: 15rem; }
+
+/* Web dashboard */
+.dash { background: var(--mist); border-radius: var(--r-l); padding: clamp(1rem, 2.5vw, 1.75rem); display: grid; grid-template-columns: auto 1fr; gap: clamp(1rem, 2vw, 1.5rem); }
+.rail { display: flex; flex-direction: column; gap: 0.5rem; }
+.rail span { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--paper); }
+.rail span.on { background: var(--ink); color: var(--paper); }
+.rail span:last-child { margin-top: auto; }
+.dash-main { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
+.dash-top { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1rem 2.5rem; padding: 0.25rem 0.5rem 0.75rem; }
+.dash-top h3 { font-size: clamp(2.25rem, 4.5vw, 3.75rem); font-weight: 700; letter-spacing: -0.05em; line-height: 0.95; margin-right: auto; }
+.dash-top h3 span { display: block; font-size: 1rem; font-weight: 400; letter-spacing: 0; color: var(--ink-soft); margin-top: 0.5rem; }
+.stat b { display: block; font-size: clamp(2rem, 3.6vw, 3rem); font-weight: 700; letter-spacing: -0.05em; line-height: 1; }
+.stat span { color: var(--ink-soft); font-size: 0.9375rem; }
+.cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+.card { background: var(--paper); border-radius: var(--r-m); padding: 1.25rem; min-width: 0; display: flex; flex-direction: column; gap: 1rem; }
+.card h4 { display: flex; align-items: center; justify-content: space-between; gap: 1rem; font-size: 1.0625rem; font-weight: 600; }
+.card.wide { grid-column: 1 / -1; }
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.375rem; text-align: center; font-size: 0.875rem; color: var(--ink-soft); }
+.week div { display: grid; gap: 0.3rem; justify-items: center; }
+.week i { width: 100%; max-width: 2.25rem; height: 1.125rem; border-radius: 99rem; background: var(--ink); }
+.week i.late { background: var(--amber); }
+.week i.miss { background: var(--coral); }
+.week i.todo { background: none; box-shadow: inset 0 0 0 1.5px #b4bdb9; }
+.week .today { color: var(--ink); font-weight: 700; }
+.legend { display: flex; flex-wrap: wrap; gap: 0.375rem 1rem; font-size: 0.875rem; color: var(--ink-soft); }
+.legend span::before { content: ""; display: inline-block; width: 0.625rem; height: 0.625rem; margin-right: 0.375rem; border-radius: 50%; background: var(--c); }
+.map { position: relative; flex: 1; min-height: 12rem; border-radius: var(--r-s); background: var(--mist); overflow: hidden; }
+.map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.map .here { position: absolute; left: 0.75rem; bottom: 0.75rem; right: 0.75rem; width: fit-content; max-width: calc(100% - 1.5rem); padding: 0.625rem 1rem; border-radius: var(--r-s); background: var(--ink); color: var(--paper); line-height: 1.25; }
+.map .here b { display: block; color: var(--lime); font-size: 1.125rem; }
+.diary { display: grid; gap: 1rem; }
+.diary li { display: grid; gap: 0.125rem; }
+.diary .said { font-size: 1.25rem; line-height: 1.2; }
+.diary span { font-size: 0.875rem; color: var(--ink-soft); }
+.prefs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 2rem; }
+.prefs li { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 0; border-bottom: 1px solid var(--hair); }
+.prefs div { flex: 1; line-height: 1.3; }
+.prefs div span { display: block; color: var(--ink-soft); font-size: 0.875rem; }
+
+/* Calendar: one open question on top, the week below */
+.calendar { background: var(--mist); border-radius: var(--r-l); padding: clamp(1rem, 2.5vw, 1.75rem); display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.75rem; }
+.ask { background: var(--paper); border-radius: var(--r-m); padding: clamp(1.5rem, 4vw, 3rem) 1.25rem; display: grid; justify-items: center; gap: 1rem; text-align: center; }
+.ask h4 { font-size: clamp(1.75rem, 3.6vw, 3rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1; max-width: 16ch; }
+.ask p { color: var(--ink-soft); max-width: 40ch; }
+.ask-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+.week-scroll { overflow-x: auto; border-radius: var(--r-m); }
+.wk { display: grid; grid-template-columns: repeat(7, minmax(6.75rem, 1fr)); gap: 0.375rem; min-width: 49rem; }
+.day { background: var(--paper); border-radius: var(--r-s); padding: 0.75rem 0.375rem; min-height: 15rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.day:first-child { border-radius: var(--r-m) var(--r-s) var(--r-s) var(--r-m); }
+.day:last-child { border-radius: var(--r-s) var(--r-m) var(--r-m) var(--r-s); }
+.day h5, .day .pills { margin: 0 0.25rem; }
+.day h5 { font-size: 0.875rem; font-weight: 400; color: var(--ink-soft); line-height: 1.1; }
+.day h5 b { display: block; font-size: 2rem; font-weight: 700; letter-spacing: -0.05em; color: var(--ink); }
+.day.now { background: var(--ink); color: var(--paper); }
+.day.now h5, .day.now h5 b { color: var(--paper); }
+.ev { display: grid; gap: 0.125rem; padding: 0.5rem; border-radius: var(--r-s); background: var(--mist); font-size: 0.875rem; line-height: 1.2; }
+.ev b { overflow-wrap: anywhere; }
+.ev .by { display: flex; align-items: center; gap: 0.375rem; margin-top: 0.25rem; font-size: 0.8125rem; }
+.ev .who { width: 1.375rem; height: 1.375rem; font-size: 0.6875rem; }
+.ev.open { background: var(--amber); color: var(--ink); }
+.day.now .ev { background: var(--paper); color: var(--ink); }
+.day .pills { display: flex; gap: 0.1875rem; margin-top: auto; }
+.pills i { flex: 1; height: 0.5rem; border-radius: 99rem; background: var(--ink); }
+.pills i.late { background: var(--amber); }
+.pills i.todo { background: none; box-shadow: inset 0 0 0 1.5px #b4bdb9; }
+.day.now .pills i { background: var(--lime); }
+.day.now .pills i.todo { background: none; box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.5); }
+.p-day li { display: grid; grid-template-columns: 4.25rem 1fr; gap: 0.5rem; align-items: baseline; padding: 0.75rem 0; border-bottom: 1px solid var(--hair); font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+.p-day li span { font-weight: 400; }
+.p-day li.past { color: var(--ink-soft); text-decoration: line-through; }
+
+/* Footer */
+.foot { background: var(--ink); color: var(--paper); padding: clamp(4rem, 9vw, 8rem) 0 2rem; overflow: hidden; }
+.foot-said { font-size: clamp(2.5rem, 8vw, 7.5rem); line-height: 0.95; max-width: 14ch; }
+.foot-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem; margin-top: clamp(3rem, 6vw, 5rem); padding-top: 1.5rem; border-top: 1px solid rgb(255 255 255 / 0.3); }
+.foot-grid > div { grid-column: span 4; }
+.foot-grid h2 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+.foot-grid p, .foot-grid li { color: rgb(255 255 255 / 0.72); }
+.foot a { color: var(--lime); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .orb[data-state="speaking"] .bars i:nth-child(odd) { transform: scaleY(0.9); }
+  .orb[data-state="speaking"] .bars i:nth-child(even) { transform: scaleY(0.5); }
+}
+@media (max-width: 60rem) {
+  .sec-head, .sec-body, .hero-meta p, .hero-meta dl, .foot-grid > div { grid-column: 1 / -1; }
+  .sec-head { position: static; }
+  .states { grid-template-columns: repeat(2, 1fr); }
+  .cards, .prefs { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 40rem) {
+  .top nav { justify-content: flex-start; }
+  .rules li, .tscale > div { grid-template-columns: 1fr; gap: 0.5rem; }
+  .swatches li { grid-template-columns: 3.5rem 1fr; gap: 0.125rem 1rem; }
+  .swatches .chip { grid-row: span 3; height: 100%; min-height: 4rem; }
+  .scale3 { grid-template-columns: 1fr; }
+  .scale3 div { min-height: 0; }
+  .phones { justify-content: center; }
+  .dash { grid-template-columns: minmax(0, 1fr); }
+  .rail { flex-direction: row; overflow-x: auto; }
+  .rail span:last-child { margin: 0 0 0 auto; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-pill" viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="8" rx="4" transform="rotate(-40 12 12)"/><path d="m9 8.5 6 7"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.800 7 11 7 11"/><circle cx="12" cy="10" r="2.500"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4h13v16H5a2 2 0 0 1 0-4h13"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.900 4.900l2.100 2.100M17 17l2.100 2.100M4.900 19.100 7 17M17 7l2.100-2.100"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4"/></symbol>
+</svg>
+
+<header class="top">
+  <nav aria-label="Sections">
+    <a class="mark" href="#start">Claudia</a>
+    <a href="#principles">Principles</a>
+    <a href="#colour">Colour</a>
+    <a href="#type">Type</a>
+    <a href="#voice">Voice</a>
+    <a href="#senior">Senior</a>
+    <a href="#caregiver">Caregiver</a>
+    <a href="#calendar">Calendar</a>
+    <a href="#dashboard">Dashboard</a>
+  </nav>
+</header>
+
+<main id="start">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap">
+      <div class="hero-word">
+        <h1 id="hero-title">Claudia</h1>
+        <button class="orb" data-state="speaking" data-live aria-label="Voice orb. Press to switch between idle, listening, thinking and speaking."><span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></button>
+      </div>
+      <p class="hero-said said">Good morning, Grete. Shall we look at today together?</p>
+      <div class="hero-meta">
+        <p>A companion you talk to. Claudia helps a senior through the day and lets the family see, at a glance, that everything is all right.</p>
+        <dl>
+          <dt>For</dt><dd>Seniors living alone, and the family who cares for them</dd>
+          <dt>Used by</dt><dd>Voice first, a few large buttons second</dd>
+          <dt>Screens</dt><dd>Senior app, caregiver app, web dashboard</dd>
+          <dt>Name</dt><dd>Working title, from the repository</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="principles" aria-labelledby="pr-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 id="pr-title">Principles</h2>
+        <p>Three rules decide every screen. When two of them pull apart, the higher one wins.</p>
+      </div>
+      <div class="sec-body">
+        <ul class="rules">
+          <li><h3>Say it, don't find it</h3><p>Anything the app can do, you can ask for out loud. A screen shows what was said and what happens next, never a menu to dig through.</p></li>
+          <li><h3>Buttons for what can't wait</h3><p>Calling family and calling for help are always one large press away, on every senior screen, in the same place.</p></li>
+          <li><h3>Everyday words only</h3><p>Tablets, not medication adherence. "Jonas is at work", not a location status. No settings page for the senior at all.</p></li>
+          <li><h3>Caregivers get the detail</h3><p>The family can type, tap and plan. Their app and the dashboard add forms and history, in the same calm look.</p></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="colour" aria-labelledby="co-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 id="co-title">Colour</h2>
+        <p>White, black and one soft grey do the work. Colour appears only when it means something.</p>
+      </div>
+      <div class="sec-body">
+        <div class="sub">
+          <h3>Six colours</h3>
+          <p>Contrast is kept high throughout. Text on lime, amber and coral is always black.</p>
+          <ul class="swatches">
+            <li><span class="chip line" style="background:var(--paper)"></span><span class="tok">Paper</span><span class="soft num">#ffffff</span><span>Every screen background</span></li>
+            <li><span class="chip" style="background:var(--mist)"></span><span class="tok">Mist</span><span class="soft num">#edf1ef</span><span>Dashboard backdrop, form fields, quiet tags</span></li>
+            <li><span class="chip" style="background:var(--ink)"></span><span class="tok">Ink</span><span class="soft num">#000000</span><span>Text, main buttons, the voice screen</span></li>
+            <li><span class="chip" style="background:var(--lime)"></span><span class="tok">Lime</span><span class="soft num">#c6f432</span><span>All good, done, confirmed</span></li>
+            <li><span class="chip" style="background:var(--amber)"></span><span class="tok">Amber</span><span class="soft num">#ffb23e</span><span>Late, unanswered, needs someone</span></li>
+            <li><span class="chip" style="background:var(--coral)"></span><span class="tok">Coral</span><span class="soft num">#ff5a3c</span><span>Emergency, and nothing else</span></li>
+          </ul>
+        </div>
+        <div class="sub">
+          <h3>One scale, used everywhere</h3>
+          <p>The same three steps colour a tablet slot, a calendar entry and an alert, so nobody has to learn a second code. The halo around the voice orb is this scale, blended.</p>
+          <div class="scale3">
+            <div style="background:var(--lime)"><b>All good</b><span>Morning tablets taken at 8:04</span></div>
+            <div style="background:var(--amber)"><b>Look at this</b><span>Nobody is driving Grete on Thursday yet</span></div>
+            <div style="background:var(--coral)"><b>Act now</b><span>Grete pressed the emergency button</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="type" aria-labelledby="ty-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 id="ty-title">Type</h2>
+        <p>One typeface made for tired eyes, and a second voice for the words Claudia speaks.</p>
+      </div>
+      <div class="sec-body">
+        <div class="sub">
+          <h3>Atkinson Hyperlegible Next</h3>
+          <p>Drawn by the Braille Institute so that similar letters stay apart: I, l and 1, or O and 0. Used for everything you read or press.</p>
+          <p class="glyphs" aria-hidden="true">Aa Il1 O0 Ää Öß 8:04</p>
+        </div>
+        <div class="sub">
+          <h3>Newsreader Italic</h3>
+          <p>Reserved for speech. If it is in this italic, Claudia said it or is about to. It never labels a button.</p>
+          <p class="glyphs said" aria-hidden="true">Shall I remind you again?</p>
+        </div>
+        <div class="sub">
+          <h3>Sizes</h3>
+          <p>The senior app starts where most apps stop. Nothing a senior must read is smaller than 22px.</p>
+          <dl class="tscale">
+            <div><dt>Senior, question<span>28px, bold</span></dt><dd style="font-size:1.75rem;font-weight:700;letter-spacing:-0.035em;line-height:1.05">Did you take your morning tablets?</dd></div>
+            <div><dt>Senior, spoken line<span>23px, serif italic</span></dt><dd class="said" style="font-size:1.4375rem;line-height:1.15">Jonas is at work. Shall I ask him to call you?</dd></div>
+            <div><dt>Large button<span>20px, bold</span></dt><dd style="font-size:1.25rem;font-weight:700">Call Jonas</dd></div>
+            <div><dt>Caregiver, text<span>16px</span></dt><dd>Doctor's appointment, Anna is driving</dd></div>
+            <div><dt>Caregiver, detail<span>14px, soft</span></dt><dd class="soft" style="font-size:0.875rem">Confirmed by voice at 8:04</dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="voice" aria-labelledby="vo-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 id="vo-title">Voice</h2>
+        <p>The orb is Claudia. It shows, without a word of text, whether she is waiting, hearing you, thinking or talking.</p>
+      </div>
+      <div class="sec-body">
+        <div class="sub">
+          <h3>Live voice mode</h3>
+          <p>Full screen and black, so the only thing to look at is the orb. Try the four states.</p>
+          <div class="stage">
+            <div class="seg" role="group" aria-label="Voice state">
+              <button type="button" data-set="idle" aria-pressed="false">Waiting</button>
+              <button type="button" data-set="listening" aria-pressed="false">Listening</button>
+              <button type="button" data-set="thinking" aria-pressed="false">Thinking</button>
+              <button type="button" data-set="speaking" aria-pressed="true">Speaking</button>
+            </div>
+            <div class="orb" id="stage-orb" data-state="speaking" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
+            <p class="stage-line said" id="stage-line" aria-live="polite">Jonas is at work. Shall I ask him to call you?</p>
+          </div>
+          <ul class="states">
+            <li><div class="orb" data-state="idle" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div><b>Waiting</b><span>Halo turns slowly. Say "Claudia" or touch the orb.</span></li>
+            <li><div class="orb" data-state="listening" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div><b>Listening</b><span>Halo widens and breathes. Your words appear in plain type.</span></li>
+            <li><div class="orb" data-state="thinking" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div><b>Thinking</b><span>Halo spins fast, dots hop. Never longer than a breath.</span></li>
+            <li><div class="orb" data-state="speaking" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div><b>Speaking</b><span>Bars move with her voice. Her words appear in italic.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="senior" aria-labelledby="se-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 id="se-title">Senior app</h2>
+        <p>One orb, one sentence, two buttons. Grete never has to look for anything.</p>
+      </div>
+      <div class="sec-body">
+        <div class="sub">
+          <h3>Four moments in Grete's day</h3>
+          <p>The two buttons at the bottom never move and never change their words.</p>
+          <div class="phones">
+            <figure>
+              <div class="phone">
+                <p class="p-hello">Good morning, Grete</p>
+                <div class="grow">
+                  <div class="orb" data-state="speaking" style="--s:7.5rem" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
+                  <p class="p-said said">The doctor is at half past two. Anna will drive you.</p>
+                </div>
+                <span class="big"><svg class="i"><use href="#i-phone"/></svg>Call Jonas</span>
+                <span class="big sos">Emergency</span>
+              </div>
+              <figcaption><b>Home</b>Claudia opens the day herself. Touching the orb starts a conversation.</figcaption>
+            </figure>
+            <figure>
+              <div class="phone dark">
+                <div class="grow">
+                  <div class="orb" data-state="listening" style="--s:9.5rem" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
+                  <p class="p-heard">Where is my son?</p>
+                </div>
+                <span class="big ghost" style="background:none;color:var(--paper);box-shadow:inset 0 0 0 2px var(--paper)">Stop listening</span>
+              </div>
+              <figcaption><b>Listening</b>The screen turns black while Grete talks. Her words appear as she says them.</figcaption>
+            </figure>
+            <figure>
+              <div class="phone">
+                <div class="grow" style="justify-items:start">
+                  <div class="orb" data-state="idle" style="--s:4.5rem" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
+                  <p class="p-q">Did you take your morning tablets?</p>
+                </div>
+                <span class="big yes">Yes, taken</span>
+                <span class="big ghost">Not yet</span>
+                <span class="big sos">Emergency</span>
+              </div>
+              <figcaption><b>Tablet check</b>Asked aloud at the planned time. Answer by voice or with a button.</figcaption>
+            </figure>
+            <figure>
+              <div class="phone">
+                <div class="grow">
+                  <div class="orb" data-state="speaking" style="--s:7.5rem" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
+                  <p class="p-said said">Jonas is at work. I've asked him to call you.</p>
+                  <span class="tag ok">Message sent to Jonas</span>
+                </div>
+                <span class="big"><svg class="i"><use href="#i-phone"/></svg>Call Jonas</span>
+                <span class="big sos">Emergency</span>
+              </div>
+              <figcaption><b>Answer</b>What Claudia did is confirmed in one short line under what she said.</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="caregiver" aria-labelledby="ca-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 id="ca-title">Caregiver app</h2>
+        <p>Jonas opens it to stop worrying. The first line answers the only question he has.</p>
+      </div>
+      <div class="sec-body">
+        <div class="sub">
+          <h3>See, plan, respond</h3>
+          <p>Voice still sits in the middle of the bar. Around it, the family can tap and type.</p>
+          <div class="phones three">
+            <figure>
+              <div class="phone">
+                <p class="p-hello">Grete is doing fine</p>
+                <span class="tag ok" style="align-self:start">At home since 11:20</span>
+                <ul class="rows p-small" style="font-size:0.9375rem">
+                  <li><span class="t num">8:04</span><span class="what">Morning tablets<span>Taken, she told Claudia</span></span><span class="tag ok" aria-label="Done" style="padding:0.375rem"></span></li>
+                  <li><span class="t num">14:30</span><span class="what">Doctor<span>Anna is driving</span></span><span class="who b">A</span></li>
+                  <li><span class="t num">Thu</span><span class="what">Hairdresser<span>Nobody yet</span></span><span class="who none">?</span></li>
+                </ul>
+                <div class="tabbar">
+                  <span class="side"><svg class="i"><use href="#i-pin"/></svg></span>
+                  <span class="mic"><svg class="i"><use href="#i-mic"/></svg></span>
+                  <span class="side"><svg class="i"><use href="#i-plus"/></svg></span>
+                </div>
+              </div>
+              <figcaption><b>Today</b>Status first, then the day in order. An open task shows a dashed circle.</figcaption>
+            </figure>
+            <figure>
+              <div class="phone">
+                <p class="p-hello">New appointment</p>
+                <div class="field">What<b>Hairdresser</b></div>
+                <div class="field">When<b>Thursday, 10:00</b></div>
+                <div class="field">Who takes Grete?
+                  <div class="pick">
+                    <span class="on"><span class="who">J</span>Jonas<br>free</span>
+                    <span><span class="who b">A</span>Anna<br>busy</span>
+                    <span><span class="who none">?</span>Ask the<br>family</span>
+                  </div>
+                </div>
+                <span class="big" style="margin-top:auto">Save appointment</span>
+              </div>
+              <figcaption><b>Add by hand</b>Claudia has already checked who is free. Grete hears about it by voice.</figcaption>
+            </figure>
+            <figure>
+              <div class="phone alarm">
+                <span class="tag alert" style="align-self:start;background:var(--ink);color:var(--paper);--dot:var(--coral)">10:42, just now</span>
+                <div class="grow" style="justify-items:start;text-align:left">
+                  <p class="p-q">Grete pressed the emergency button</p>
+                  <p>She is at home, Breiter Weg 12.</p>
+                </div>
+                <span class="big"><svg class="i"><use href="#i-phone"/></svg>Call Grete</span>
+                <span class="big ghost">I'm on my way</span>
+              </div>
+              <figcaption><b>Alert</b>The only full-colour screen in the product. What happens after an alert is still open.</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="calendar" aria-labelledby="cal-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 id="cal-title">Calendar</h2>
+        <p>One calendar for the whole family. Grete hears it, the family sees it, and anything unsettled is asked as a single question.</p>
+      </div>
+      <div class="sec-body">
+        <div class="sub">
+          <h3>The week, for the family</h3>
+          <p>An appointment nobody has taken turns amber and becomes the question at the top. Once answered, the question disappears.</p>
+          <div class="calendar">
+            <div class="ask">
+              <h4>Who takes Grete to the hairdresser?</h4>
+              <p>Thursday at 10:00. Jonas is free, Anna is at work until 13:00.</p>
+              <div class="ask-acts">
+                <button type="button" class="btn">I'll take it</button>
+                <button type="button" class="btn line">Ask Anna</button>
+              </div>
+            </div>
+            <div class="week-scroll" tabindex="0" role="group" aria-label="Week of 12 to 18 November">
+              <div class="wk">
+                <div class="day"><h5>Mon<b class="num">12</b></h5>
+                  <p class="ev"><span class="num">10:00</span><b>Physio</b><span class="by"><span class="who b">A</span>Anna drove</span></p>
+                  <span class="pills" role="img" aria-label="All three tablets taken"><i></i><i></i><i></i></span></div>
+                <div class="day"><h5>Tue<b class="num">13</b></h5>
+                  <span class="pills" role="img" aria-label="Three tablets taken, one late"><i></i><i class="late"></i><i></i></span></div>
+                <div class="day now"><h5>Today<b class="num">14</b></h5>
+                  <p class="ev"><span class="num">14:30</span><b>Doctor</b><span class="by"><span class="who b">A</span>Anna drives</span></p>
+                  <span class="pills" role="img" aria-label="Two of three tablets taken so far"><i></i><i></i><i class="todo"></i></span></div>
+                <div class="day"><h5>Thu<b class="num">15</b></h5>
+                  <p class="ev open"><span class="num">10:00</span><b>Hairdresser</b><span class="by"><span class="who none">?</span>Nobody yet</span></p>
+                  <span class="pills" aria-hidden="true"><i class="todo"></i><i class="todo"></i><i class="todo"></i></span></div>
+                <div class="day"><h5>Fri<b class="num">16</b></h5>
+                  <p class="ev"><span class="num">17:00</span><b>Jonas visits</b><span class="by"><span class="who">J</span>Jonas</span></p>
+                  <span class="pills" aria-hidden="true"><i class="todo"></i><i class="todo"></i><i class="todo"></i></span></div>
+                <div class="day"><h5>Sat<b class="num">17</b></h5>
+                  <p class="ev"><span class="num">15:00</span><b>Coffee with Helga</b><span class="by">Grete added this</span></p>
+                  <span class="pills" aria-hidden="true"><i class="todo"></i><i class="todo"></i><i class="todo"></i></span></div>
+                <div class="day"><h5>Sun<b class="num">18</b></h5>
+                  <p class="ev"><span class="num">11:00</span><b>Call with Anna</b><span class="by"><span class="who b">A</span>Anna</span></p>
+                  <span class="pills" aria-hidden="true"><i class="todo"></i><i class="todo"></i><i class="todo"></i></span></div>
+              </div>
+            </div>
+          </div>
+          <p class="cap">The three small bars at the foot of each day are the tablets: morning, midday, evening. What happens when nobody is free is still open.</p>
+        </div>
+        <div class="sub">
+          <h3>The day, for Grete</h3>
+          <p>Grete never sees a grid. Claudia reads the day aloud, and a new appointment is one question with two answers.</p>
+          <div class="phones">
+            <figure>
+              <div class="phone">
+                <p class="p-hello">Today</p>
+                <ul class="p-day">
+                  <li class="past"><span class="num">8:00</span>Morning tablets</li>
+                  <li><span class="num">14:30</span>Doctor, Anna drives</li>
+                  <li><span class="num">20:00</span>Evening tablets</li>
+                </ul>
+                <span class="big" style="margin-top:auto"><svg class="i"><use href="#i-phone"/></svg>Call Jonas</span>
+                <span class="big sos">Emergency</span>
+              </div>
+              <figcaption><b>Today</b>Shown when Grete asks "What's on today?". Three lines at most, done things crossed out.</figcaption>
+            </figure>
+            <figure>
+              <div class="phone">
+                <div class="grow" style="justify-items:start;text-align:left">
+                  <div class="orb" data-state="speaking" style="--s:4.5rem" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
+                  <p class="p-said said">Hairdresser on Thursday at ten. Shall I put it in?</p>
+                </div>
+                <span class="big yes">Yes, put it in</span>
+                <span class="big ghost">No</span>
+                <span class="big sos">Emergency</span>
+              </div>
+              <figcaption><b>New appointment</b>Grete says it, Claudia repeats it back. The family is asked who can take her.</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="dashboard" aria-labelledby="da-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 id="da-title">Dash&shy;board</h2>
+        <p>The same information with room to breathe, for planning the week and telling Claudia how to behave.</p>
+      </div>
+      <div class="sec-body">
+        <div class="sub">
+          <h3>Web dashboard for the family</h3>
+          <p>White cards on mist. Large numbers answer first, the detail sits below.</p>
+          <div class="dash">
+            <div class="rail" aria-hidden="true">
+              <span class="on"><svg class="i"><use href="#i-home"/></svg></span>
+              <span><svg class="i"><use href="#i-cal"/></svg></span>
+              <span><svg class="i"><use href="#i-pill"/></svg></span>
+              <span><svg class="i"><use href="#i-pin"/></svg></span>
+              <span><svg class="i"><use href="#i-book"/></svg></span>
+              <span><svg class="i"><use href="#i-gear"/></svg></span>
+            </div>
+            <div class="dash-main">
+              <div class="dash-top">
+                <h3>Grete's day<span>Wednesday, 14 November</span></h3>
+                <p class="stat"><b class="num">2 of 3</b><span>tablets taken today</span></p>
+                <p class="stat"><b class="num">1</b><span>task needs someone</span></p>
+              </div>
+              <div class="cards">
+                <div class="card">
+                  <h4>Tablets this week<span class="tag ok">On track</span></h4>
+                  <div class="week" role="img" aria-label="Tablets this week: all taken Monday and Tuesday, one late on Tuesday, two of three taken today">
+                    <div>Mon<i></i><i></i><i></i></div>
+                    <div>Tue<i></i><i class="late"></i><i></i></div>
+                    <div class="today">Wed<i></i><i></i><i class="todo"></i></div>
+                    <div>Thu<i class="todo"></i><i class="todo"></i><i class="todo"></i></div>
+                    <div>Fri<i class="todo"></i><i class="todo"></i><i class="todo"></i></div>
+                    <div>Sat<i class="todo"></i><i class="todo"></i><i class="todo"></i></div>
+                    <div>Sun<i class="todo"></i><i class="todo"></i><i class="todo"></i></div>
+                  </div>
+                  <p class="legend"><span style="--c:var(--ink)">Taken</span><span style="--c:var(--amber)">Taken late</span><span style="--c:var(--coral)">Missed</span></p>
+                </div>
+                <div class="card">
+                  <h4>Where Grete is<span class="tag ok">At home</span></h4>
+                  <div class="map" role="img" aria-label="Map showing Grete at home">
+                    <svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                      <g stroke="#fff" stroke-width="14" fill="none" stroke-linecap="round"><path d="M-10 60 150 80 410 30M150 80l30 150M-10 170l190-10 230 40M290 55l20 140"/></g>
+                      <path d="M180 160c40-20 70-60 115-78" stroke="#000" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" fill="none"/>
+                      <circle cx="180" cy="160" r="20" fill="#c6f432" opacity="0.55"/><circle cx="180" cy="160" r="8" fill="#000"/>
+                      <circle cx="295" cy="82" r="5" fill="#fff" stroke="#000" stroke-width="3"/>
+                    </svg>
+                    <p class="here"><b>Home</b>Back from the bakery at 11:20</p>
+                  </div>
+                </div>
+                <div class="card">
+                  <h4>Coming up<button type="button" class="btn sm"><svg class="i"><use href="#i-plus"/></svg>Add</button></h4>
+                  <ul class="rows">
+                    <li><span class="t num">14:30</span><span class="what">Doctor<span>Today</span></span><span class="who b">A</span></li>
+                    <li><span class="t num">10:00</span><span class="what">Hairdresser<span>Thursday, nobody yet</span></span><button type="button" class="btn line sm">I'll take it</button></li>
+                    <li><span class="t num">15:00</span><span class="what">Coffee with Helga<span>Saturday, Grete added this</span></span><span class="who">J</span></li>
+                  </ul>
+                </div>
+                <div class="card">
+                  <h4>From Grete's diary</h4>
+                  <ul class="diary">
+                    <li><p class="said">"I slept well. The knee is better than yesterday."</p><span>Today, 8:10</span></li>
+                    <li><p class="said">"Helga is coming on Saturday, I want to bake."</p><span>Yesterday, 17:45</span></li>
+                  </ul>
+                </div>
+                <div class="card wide">
+                  <h4>How Claudia behaves</h4>
+                  <ul class="prefs">
+                    <li><div>Remind Grete twice before telling me<span>For tablets and appointments</span></div><button type="button" class="switch" role="switch" aria-checked="true" aria-label="Remind Grete twice before telling me"></button></li>
+                    <li><div>Speak slowly<span>Claudia leaves longer pauses</span></div><button type="button" class="switch" role="switch" aria-checked="true" aria-label="Speak slowly"></button></li>
+                    <li><div>Grete may ask where I am<span>She hears "at work", never an address</span></div><button type="button" class="switch" role="switch" aria-checked="false" aria-label="Grete may ask where I am"></button></li>
+                    <li><div>Start the day with a greeting<span>Every morning at 8:00</span></div><button type="button" class="switch" role="switch" aria-checked="true" aria-label="Start the day with a greeting"></button></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="cap">Settings are written as sentences about Claudia's behaviour. The switches work; everything else is a still.</p>
+        </div>
+
+        <div class="sub">
+          <h3>Parts</h3>
+          <p>Three corner sizes carry the hierarchy: screens and stages are roundest, cards sit in the middle, fields are tightest. Anything you press is a full pill or a large block.</p>
+          <div class="kit">
+            <span class="big"><svg class="i"><use href="#i-phone"/></svg>Call Jonas</span>
+            <span class="big yes">Yes, taken</span>
+            <span class="big ghost">Not yet</span>
+            <span class="big sos">Emergency</span>
+          </div>
+          <div class="kit" style="margin-top:1rem">
+            <button type="button" class="btn">Save appointment</button>
+            <button type="button" class="btn line">I'll take it</button>
+            <span class="tag ok">At home</span>
+            <span class="tag wait">Nobody yet</span>
+            <span class="tag alert">Emergency</span>
+            <span class="who">J</span><span class="who b">A</span><span class="who none">?</span>
+            <button type="button" class="switch" role="switch" aria-checked="true" aria-label="Example switch"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p class="foot-said said">I'll let Jonas know you're well.</p>
+    <div class="foot-grid">
+      <div>
+        <h2>Project</h2>
+        <p>Magdehack pilot #6: mental health of family caregivers. A voice agent for seniors that gives the family visibility and relief.</p>
+      </div>
+      <div>
+        <h2>Sources</h2>
+        <ul>
+          <li><a href="project.md">Pitch brief</a></li>
+          <li><a href="user-story-map.md">User story map</a></li>
+          <li><a href="features/01-calendar.md">Calendar</a>, <a href="features/02-pill-checker.md">tablets</a>, <a href="features/03-live-location.md">location</a>, <a href="features/04-qa-setup.md">questions and setup</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Note</h2>
+        <p>Design exploration. People, times and places are made up. Points the feature specs mark as open, such as what follows an alert, are shown as examples only.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const lines = {
+    idle: ["said", "Say “Claudia” when you need me."],
+    listening: ["heard", "Where is my son?"],
+    thinking: ["said", " "],
+    speaking: ["said", "Jonas is at work. Shall I ask him to call you?"],
+  };
+  const order = Object.keys(lines);
+  const stageOrb = document.getElementById("stage-orb");
+  const line = document.getElementById("stage-line");
+  const heroOrb = document.querySelector(".hero .orb");
+  const setStage = (s) => {
+    stageOrb.dataset.state = s;
+    line.className = "stage-line " + lines[s][0];
+    line.textContent = lines[s][1];
+    document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.set === s));
+  };
+  document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => setStage(b.dataset.set)));
+  heroOrb.addEventListener("click", () => {
+    heroOrb.dataset.state = order[(order.indexOf(heroOrb.dataset.state) + 1) % order.length];
+  });
+  document.querySelectorAll(".switch").forEach((s) => s.addEventListener("click", () => {
+    s.setAttribute("aria-checked", s.getAttribute("aria-checked") !== "true");
+  }));
+})();
+</script>
+</body>
+</html>
