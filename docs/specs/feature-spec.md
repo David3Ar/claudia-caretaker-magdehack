@@ -306,7 +306,7 @@ Six scenarios to show in the pitch. Dialogue lines are the script; names in brac
 |---|---|
 | G | "Hey Claudia, when is my next dentist appointment and who could bring me?" |
 | Claudia | "Let me check." |
-| Claudia | Gives the exact date and time. "Your son [name] already accepted and will bring you." (PNGs use Wednesday, 2 December, 10:30 and "Jonas" as examples) |
+| Claudia | Gives the exact date and time. "Your son [name] already accepted and will bring you." (PNGs use Friday, 23 November, 10:30 and "Jonas" as examples) |
 | Claudia | "I'll remind you three days in advance and the day before. Is that okay?" |
 | G | Confirms. |
 
