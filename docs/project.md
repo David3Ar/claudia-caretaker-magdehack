@@ -54,13 +54,9 @@ flowchart LR
 | **Cognition** | Agent-initiated dialogues: nostalgie + response logging & change detection |
 | **Health** | Calendar + reminders with confirmation · pill checker |
 
-<br />
 
-<br />
 
-<br />
 
-<br />
 
 <br />
 
