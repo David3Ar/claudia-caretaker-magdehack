@@ -10,7 +10,7 @@
 | 1 | Calendar / Scheduling | [`01-calendar/spec.md`](01-calendar/spec.md) | Six flows, step by step in [`01-calendar/flows.html`](01-calendar/flows.html); PNGs of flow 1 in [`01-calendar/img/`](01-calendar/img/) |
 | 2 | Pill Checker | [`02-pill-checker/spec.md`](02-pill-checker/spec.md) | Six flows, step by step in [`02-pill-checker/flows.html`](02-pill-checker/flows.html); PNGs of all flows in [`02-pill-checker/img/`](02-pill-checker/img/) |
 | 3 | Live Location + Emergency Alert | [`03-live-location/spec.md`](03-live-location/spec.md) | Five flows, step by step in [`03-live-location/flows.html`](03-live-location/flows.html); PNGs of all flows in [`03-live-location/img/`](03-live-location/img/) |
-| 4 | QA / Setup | [`04-qa-setup/spec.md`](04-qa-setup/spec.md) | — |
+| 4 | QA / Setup | [`04-qa-setup/spec.md`](04-qa-setup/spec.md) | Six flows, step by step in [`04-qa-setup/flows.html`](04-qa-setup/flows.html); PNGs of all flows in [`04-qa-setup/img/`](04-qa-setup/img/) |
 
 ## Product
 

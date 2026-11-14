@@ -45,3 +45,5 @@ flowchart LR
 - [ ] Which config is voice-changeable, and by whom (C vs. G rights)
 - [ ] Web QA sources / safety filtering
 - [ ] "Setup" onboarding flow itself not drawn
+
+Spec, requirements and flows: [`specs/04-qa-setup/spec.md`](../specs/04-qa-setup/spec.md)

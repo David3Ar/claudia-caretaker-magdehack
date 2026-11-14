@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QA and Setup Flows</title>
+<meta name="description" content="The six QA and setup flows of Claudia, step by step. Pick a flow, then go through it screen by screen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@1,6..72,400&display=swap">
+<style>
+/* Tokens and components follow docs/design.html. Page and player are the same as 01-calendar/flows.html */
+:root {
+  --paper: #ffffff; --mist: #edf1ef; --ink: #000000; --ink-soft: #5c6662;
+  --grey: #8f9a95; --lime: #c6f432; --amber: #ffb23e; --coral: #ff5a3c; --hair: rgb(0 0 0 / 0.12);
+  --sans: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: Newsreader, Georgia, serif;
+  --r-s: 0.75rem; --r-m: 1.5rem; --r-l: 2.75rem;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-family: var(--sans); color: var(--ink); background: var(--paper); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4, h5, p, ul, ol, dl, dd { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.soft { color: var(--ink-soft); }
+.num { font-variant-numeric: tabular-nums; }
+.said { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* Page */
+.page { max-width: 86rem; margin: 0 auto; padding: 1.5rem clamp(1rem, 4vw, 3rem) 3rem; display: grid; gap: 1.5rem; }
+.head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem; }
+.brand { display: flex; align-items: center; gap: 0.625rem; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.03em; margin-right: auto; }
+.head a { color: var(--ink); }
+.picker { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.picker button { border: 0; padding: 0.625rem 1.125rem; border-radius: 99rem; background: var(--mist); font-weight: 600; text-align: left; }
+.picker button span { color: var(--ink-soft); font-weight: 400; margin-right: 0.375rem; }
+.picker button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.picker button[aria-pressed="true"] span { color: rgb(255 255 255 / 0.65); }
+
+/* Stage: text and controls left, device right */
+.stage { display: grid; grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 4rem); align-items: start; }
+.info { display: grid; gap: 1.25rem; position: sticky; top: 1.5rem; }
+.info h1 { font-size: clamp(2.25rem, 4.4vw, 3.75rem); font-weight: 800; letter-spacing: -0.05em; line-height: 0.95; }
+.count { font-size: 1.0625rem; color: var(--ink-soft); }
+.actor { display: inline-flex; align-items: center; gap: 0.5rem; justify-self: start; padding: 0.25rem 0.875rem 0.25rem 0.25rem; border-radius: 99rem; background: var(--mist); font-weight: 600; }
+.actor .who, .actor .orb { --s: 1.75rem; width: 1.75rem; height: 1.75rem; }
+.info h2 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+.info .why { color: var(--ink-soft); max-width: 34ch; font-size: 1.0625rem; }
+.example[hidden] { display: none; }
+.example { display: inline-block; padding: 0.125rem 0.625rem; border-radius: 99rem; box-shadow: inset 0 0 0 1px var(--hair); font-size: 0.875rem; color: var(--ink-soft); justify-self: start; }
+.nav { display: flex; align-items: center; gap: 0.5rem; }
+.dots { display: flex; gap: 0.25rem; margin: 0 0.5rem; flex-wrap: wrap; }
+.dots button { width: 2rem; height: 2rem; border: 0; border-radius: 50%; background: var(--mist); font-weight: 600; font-size: 0.875rem; }
+.dots button[aria-current="step"] { background: var(--ink); color: var(--paper); }
+.hint { font-size: 0.875rem; color: var(--ink-soft); }
+.device { display: grid; justify-items: center; gap: 0.875rem; min-width: 0; }
+.device > p { font-size: 0.9375rem; color: var(--ink-soft); }
+
+/* Components from design.html */
+.orb { --s: 10rem; position: relative; width: var(--s); height: var(--s); flex: none; border-radius: 50%; display: grid; place-items: center; isolation: isolate; }
+.orb::before { content: ""; position: absolute; inset: 0; z-index: -2; border-radius: 50%; background: conic-gradient(var(--lime), var(--amber), var(--coral), var(--amber), var(--lime)); filter: blur(calc(var(--s) * 0.055)); animation: spin 14s linear infinite; }
+.orb::after { content: ""; position: absolute; inset: 7%; z-index: -1; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #ffffff, #e6eae8 75%); }
+.bars { display: flex; align-items: center; gap: calc(var(--s) * 0.045); height: calc(var(--s) * 0.32); }
+.bars i { width: calc(var(--s) * 0.055); height: 100%; border-radius: 99rem; background: var(--ink); transform: scaleY(0.17); }
+.orb[data-state="idle"] .bars { opacity: 0.35; }
+.orb[data-state="listening"]::after { inset: 13%; }
+.orb[data-state="listening"]::before { animation: spin 14s linear infinite, breathe 1.6s ease-in-out infinite; }
+.orb[data-state="thinking"]::before { animation-duration: 2.2s; }
+.orb[data-state="thinking"]::after { inset: 4%; }
+.orb[data-state="thinking"] .bars i { animation: hop 0.9s ease-in-out infinite; }
+.orb[data-state="speaking"] .bars i { animation: talk 0.7s ease-in-out infinite alternate; }
+.bars i:nth-child(2) { animation-delay: -0.45s !important; }
+.bars i:nth-child(3) { animation-delay: -0.2s !important; }
+.bars i:nth-child(4) { animation-delay: -0.6s !important; }
+.bars i:nth-child(5) { animation-delay: -0.3s !important; }
+@keyframes spin { to { rotate: 1turn; } }
+@keyframes breathe { 50% { scale: 1.09; } }
+@keyframes talk { from { transform: scaleY(0.2); } to { transform: scaleY(1); } }
+@keyframes hop { 0%, 100% { transform: scaleY(0.17) translateY(0); } 50% { transform: scaleY(0.17) translateY(-160%); } }
+@keyframes live { 50% { opacity: 0.35; } }
+
+.phone { width: 20rem; max-width: 100%; aspect-ratio: 9 / 18.5; border: 2px solid var(--ink); border-radius: var(--r-l); background: var(--paper); padding: 1.25rem 1.125rem 1.125rem; display: flex; flex-direction: column; gap: 0.875rem; overflow: hidden; }
+.phone::before { content: ""; align-self: center; width: 4.5rem; height: 1.125rem; border-radius: 99rem; background: var(--ink); flex: none; }
+.phone.dark { background: var(--ink); color: var(--paper); }
+.phone.dark::before { background: #262626; }
+.phone.alarm { background: var(--coral); }
+.grow { flex: 1; display: grid; place-items: center; align-content: center; gap: 1.25rem; text-align: center; min-height: 0; }
+.grow.left { justify-items: start; text-align: left; }
+.grow.top { align-content: start; justify-items: stretch; text-align: left; gap: 0.875rem; }
+.p-hello { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+.p-said { font-size: 1.5rem; line-height: 1.15; }
+.p-heard { font-size: 1.4375rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+.asked { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.015em; line-height: 1.2; color: var(--ink-soft); max-width: 16rem; }
+.phone.alarm .asked { color: rgb(0 0 0 / 0.7); }
+.p-q { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; }
+.listening { font-size: 0.9375rem; color: rgb(255 255 255 / 0.6); text-align: center; }
+.big { display: flex; align-items: center; justify-content: center; gap: 0.625rem; width: 100%; min-height: 4rem; padding: 0.75rem 1rem; border-radius: var(--r-m); background: var(--ink); color: var(--paper); font-size: 1.25rem; font-weight: 700; text-align: center; line-height: 1.1; flex: none; }
+.big.sos { background: var(--coral); color: var(--ink); }
+.big.yes { background: var(--lime); color: var(--ink); }
+.big.ghost { background: none; color: inherit; box-shadow: inset 0 0 0 2px currentColor; }
+.big.mid { min-height: 3.25rem; font-size: 1.0625rem; }
+.tag { justify-self: start; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 99rem; background: var(--paper); box-shadow: inset 0 0 0 1px var(--hair); font-size: 0.9375rem; font-weight: 500; white-space: nowrap; }
+.tag::before { content: ""; width: 0.625rem; height: 0.625rem; border-radius: 50%; background: var(--dot, var(--lime)); box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35); flex: none; }
+.tag.inv { background: var(--ink); color: var(--paper); box-shadow: none; }
+.grow:not(.left):not(.top) .tag { justify-self: center; }
+.who { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 0.8125rem; font-weight: 700; flex: none; }
+.who.b { background: var(--mist); color: var(--ink); box-shadow: inset 0 0 0 1px var(--hair); }
+.who.g { background: var(--lime); color: var(--ink); }
+.who.xl { width: 6rem; height: 6rem; font-size: 2.5rem; }
+.rows li { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid var(--hair); line-height: 1.25; }
+.rows li:last-child { border-bottom: 0; }
+.rows .t { width: 3.5rem; flex: none; font-weight: 600; }
+.rows .what { flex: 1; min-width: 0; }
+.rows .what span { display: block; color: var(--ink-soft); font-size: 0.875rem; }
+.tabbar { display: flex; align-items: center; justify-content: space-between; padding: 0 0.75rem; flex: none; margin-top: auto; }
+.tabbar .mic { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 1.125rem; }
+.tabbar .side { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--mist); }
+.tabbar .side.on { background: var(--ink); color: var(--paper); }
+
+/* Hands-free: wake word pill and the words to say instead of buttons */
+.wake { display: inline-flex; align-items: center; gap: 0.5rem; align-self: center; padding: 0.5rem 0.875rem; border-radius: 99rem; background: var(--mist); font-size: 1rem; font-weight: 600; white-space: nowrap; flex: none; }
+.wake::before { content: ""; width: 0.625rem; height: 0.625rem; border-radius: 50%; background: var(--lime); box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35); animation: live 2s ease-in-out infinite; }
+.phone.dark .wake { background: rgb(255 255 255 / 0.14); }
+.phone.alarm .wake { background: rgb(0 0 0 / 0.12); }
+.say { display: grid; gap: 0.5rem; justify-items: center; flex: none; padding-bottom: 0.25rem; }
+.say small { font-size: 0.875rem; opacity: 0.7; }
+.say div { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.375rem; }
+.say span { padding: 0.5rem 0.875rem; border-radius: 99rem; box-shadow: inset 0 0 0 1.5px currentColor; font-weight: 600; font-size: 1.0625rem; }
+
+/* Location */
+.map { position: relative; border-radius: var(--r-s); background: var(--mist); overflow: hidden; min-height: 10rem; flex: none; }
+.map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.map .here { position: absolute; left: 0.625rem; bottom: 0.625rem; max-width: calc(100% - 1.25rem); padding: 0.5rem 0.875rem; border-radius: var(--r-s); background: var(--ink); color: var(--paper); line-height: 1.2; font-size: 0.875rem; }
+.map .here b { display: block; color: var(--lime); font-size: 1.0625rem; }
+.map .here.alert b { color: var(--coral); }
+.places li { display: grid; grid-template-columns: 3rem 1rem 1fr; align-items: center; gap: 0.375rem; padding: 0.3rem 0; font-size: 0.9375rem; line-height: 1.2; }
+.places .t { font-weight: 600; }
+.places i { width: 0.625rem; height: 0.625rem; border-radius: 50%; background: var(--paper); box-shadow: inset 0 0 0 2px var(--ink); justify-self: center; }
+.places li.now i { background: var(--lime); box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35); }
+.places li.move { color: var(--ink-soft); }
+.places li.move i { width: 2px; height: 1rem; border-radius: 0; box-shadow: none; background: #b4bdb9; }
+.note { display: grid; gap: 0.625rem; padding: 0.875rem; border-radius: var(--r-m); background: var(--amber); text-align: left; }
+.note b { font-size: 1.25rem; letter-spacing: -0.02em; line-height: 1.1; }
+.note span { font-size: 0.875rem; }
+.note .acts { display: flex; gap: 0.375rem; }
+.pill { display: inline-flex; align-items: center; gap: 0.375rem; min-height: 2.25rem; padding: 0 0.875rem; border-radius: 99rem; background: var(--ink); color: var(--paper); font-size: 0.9375rem; font-weight: 600; }
+.pill.line { background: none; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+
+/* Web dashboard: location view */
+.screen { width: 100%; max-width: 56rem; }
+.dash { background: var(--mist); border-radius: var(--r-l); padding: clamp(0.75rem, 2vw, 1.5rem); display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 0.625rem; }
+.dash-top { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.5rem 2rem; padding: 0.25rem 0.5rem; }
+.dash-top h3 { font-size: 2rem; font-weight: 700; letter-spacing: -0.045em; line-height: 1; margin-right: auto; }
+.stat b { display: block; font-size: 1.75rem; font-weight: 700; letter-spacing: -0.05em; line-height: 1; }
+.stat span { color: var(--ink-soft); font-size: 0.875rem; }
+.card { background: var(--paper); border-radius: var(--r-m); padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; min-width: 0; }
+.card h4 { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; font-size: 1rem; font-weight: 600; }
+.card.wide { grid-column: 1 / -1; }
+.card .map { flex: 1; min-height: 14rem; }
+.prefs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1.5rem; }
+.prefs li { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid var(--hair); font-size: 0.9375rem; line-height: 1.25; }
+.prefs div { flex: 1; }
+.prefs div span { display: block; color: var(--ink-soft); font-size: 0.8125rem; }
+.switch { position: relative; width: 2.75rem; height: 1.625rem; flex: none; border-radius: 99rem; background: #c3cbc7; }
+.switch::after { content: ""; position: absolute; top: 0.1875rem; left: 0.1875rem; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: var(--paper); }
+.switch.on { background: var(--ink); }
+.switch.on::after { left: 1.3125rem; }
+
+/* QA and setup */
+.code { font-size: 2.5rem; font-weight: 800; letter-spacing: 0.08em; padding: 0.5rem 1.25rem; border-radius: var(--r-m); background: var(--mist); font-variant-numeric: tabular-nums; }
+.phone .prefs { grid-template-columns: minmax(0, 1fr); }
+.phone .prefs li { padding: 0.5rem 0; }
+.diary li { display: grid; gap: 0.25rem; padding: 0.625rem 0; border-bottom: 1px solid var(--hair); line-height: 1.25; }
+.diary li:last-child { border-bottom: 0; }
+.diary .t { font-size: 0.875rem; color: var(--ink-soft); }
+.diary b { font-weight: 600; }
+.diary .tag { font-size: 0.8125rem; }
+
+/* Theme: caregiver screens (app, dashboard) are dark by default, Grete's phone is light. Both can be switched in settings. */
+[data-theme="dark"] { --paper: #000000; --ink: #ffffff; --ink-soft: #9aa5a0; --mist: #1d2120; --hair: rgb(255 255 255 / 0.16); color: var(--ink); }
+[data-theme="dark"] .orb { --ink: #000000; --paper: #ffffff; }
+[data-theme="dark"] :is(.note, .phone.alarm, .phone.warn, .ev.done, .ev.rem, .ev.moved, .ev.missed, .big.yes, .big.sos, .who.g, .bubble:not(.in), .pick > span.on .who) { --paper: #ffffff; --ink: #000000; --ink-soft: #5c6662; --mist: #edf1ef; --hair: rgb(0 0 0 / 0.12); color: #000000; }
+[data-theme="dark"] > p { color: var(--ink-soft); }
+[data-theme="dark"] .phone { border-color: #000000; }
+[data-theme="dark"] .phone::before { background: #262626; }
+[data-theme="dark"] .phone.dark { background: #000000; color: #ffffff; }
+[data-theme="dark"] .phone.alarm::before, [data-theme="dark"] .phone.warn::before { background: #000000; }
+[data-theme="dark"] .map svg g { stroke: #333a37; }
+[data-theme="dark"] .map svg path[stroke="#000"] { stroke: #ffffff; }
+[data-theme="dark"] .map svg circle[fill="#000"] { fill: #ffffff; }
+[data-theme="dark"] .map .here { background: #000000; color: #ffffff; box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25); }
+[data-theme="dark"] .push { box-shadow: 0 0 0 1px rgb(255 255 255 / 0.25); }
+[data-theme="dark"] .ev.new { box-shadow: 0 0 0 2px #000000, 0 0 0 4px #ffffff; }
+[data-theme="dark"] .day.now { background: #2b302e; }
+[data-theme="dark"] .day.now h5, [data-theme="dark"] .day.now h5 b { color: #ffffff; }
+[data-theme="dark"] .day.now .ev:not(.done):not(.moved):not(.missed):not(.rem) { background: #000000; }
+[data-theme="dark"] .check { background-color: #2b302e; }
+[data-theme="dark"] .switch:not(.on) { background: #3a403e; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } .orb[data-state="speaking"] .bars i:nth-child(odd) { transform: scaleY(0.9); } .orb[data-state="speaking"] .bars i:nth-child(even) { transform: scaleY(0.5); } }
+@media (max-width: 60rem) {
+  .stage { grid-template-columns: minmax(0, 1fr); }
+  .info { position: static; }
+  .dash, .prefs { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.500 1.500a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11"/><circle cx="12" cy="10" r="2.5"/></symbol>
+</svg>
+
+<div class="page">
+  <header class="head">
+    <span class="brand"><span class="orb" style="--s:1.75rem" data-state="idle"></span>Claudia, QA and setup flows</span>
+    <a href="spec.md">Spec</a>
+    <a href="../../design.html">Design</a>
+  </header>
+  <nav class="picker" id="picker" aria-label="Flow"></nav>
+  <main class="stage">
+    <section class="info" aria-live="polite">
+      <h1 id="flow-title"></h1>
+      <p class="count" id="count"></p>
+      <span class="actor" id="actor"></span>
+      <h2 id="step-title"></h2>
+      <p class="why" id="step-why"></p>
+      <span class="example" id="example" hidden>Example content, open in the spec</span>
+      <div class="nav">
+        <button type="button" class="big mid ghost" id="prev" style="width:auto;padding:0 1.25rem">Back</button>
+        <div class="dots" id="dots"></div>
+        <button type="button" class="big mid" id="next" style="width:auto;padding:0 1.5rem">Next</button>
+      </div>
+      <p class="hint">Caregiver screens are dark and Grete's are light by default; both can be changed in settings. Arrow keys work too. People, times, places and answers are made up.</p>
+    </section>
+    <section class="device">
+      <p id="dev-label"></p>
+      <div id="dev" style="display:contents"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+(() => {
+  const ic = (n) => `<svg class="i"><use href="#i-${n}"/></svg>`;
+  const orb = (state, s) => `<div class="orb" data-state="${state}" style="--s:${s}rem" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>`;
+  const wake = `<span class="wake">Say “Hey Claudia”</span>`;
+  const fixed = `${wake}<span class="big">${ic("phone")}Call Jonas</span><span class="big sos">Emergency</span>`;
+  const tabbar = () => `<div class="tabbar"><span class="side">${ic("pin")}</span><span class="mic">${ic("mic")}</span><span class="side">${ic("plus")}</span></div>`;
+  const tag = (t, dot) => `<span class="tag"${dot ? ` style="--dot:var(--${dot})"` : ""}>${t}</span>`;
+  const say = (opts, lead = "Just say") => `<div class="say"><small>${lead}</small><div>${opts.map((o) => `<span>“${o}”</span>`).join("")}</div></div>`;
+  const asked = (q) => (q ? `<p class="asked">“${q}”</p>` : "");
+
+  // Grete. Whoever talks to Claudia appears above the orb; what Claudia says appears below it.
+  const hear = (text, line = "Listening, hands-free") => `<div class="phone dark"><div class="grow"><p class="p-heard">${text}</p>${orb("listening", 9.5)}</div><p class="listening">${line}</p></div>`;
+  const gSay = (text, state = "speaking", extra = "", q = "") => `<div class="phone"><div class="grow">${asked(q)}${orb(state, 7.5)}<p class="p-said said">${text}</p>${extra}</div>${fixed}</div>`;
+  const gVoice = (text, opts, state = "speaking", extra = "", q = "") => `<div class="phone"><div class="grow">${asked(q)}${orb(state, 7.5)}<p class="p-said said">${text}</p>${extra}</div>${say(opts)}</div>`;
+  const gDoctor = `<div class="phone dark"><div class="grow"><span class="who xl b">Dr</span><p class="p-hello">Connecting to a doctor…</p><p class="listening">Certified telemedicine · on speaker</p></div>${say(["Hey Claudia, hang up"], "To end")}</div>`;
+  const gDiary = `<div class="phone"><p class="p-hello">My diary</p><div class="grow top"><ul class="diary">
+    <li><span class="t num">Today, 9:12</span><b>Slept badly, my back hurts.</b>${tag("Shared with Jonas")}</li>
+    <li><span class="t num">Today, 8:40</span><b>Asked when the pharmacy closes.</b>${tag("Private", "grey")}</li>
+    <li><span class="t num">Yesterday, 19:05</span><b>Anna called, we talked about the garden.</b>${tag("Private", "grey")}</li>
+  </ul></div>${say(["Delete the last one", "Read it to me"])}</div>`;
+
+  // Jonas
+  const today = `<ul class="rows"><li><span class="t num">8:04</span><span class="what">Morning tablets<span>Taken</span></span></li><li><span class="t num">14:30</span><span class="what">Doctor<span>Anna is driving</span></span><span class="who b">A</span></li></ul>`;
+  const cToday = (title, status, extra = "") => `<div class="phone"><p class="p-hello">${title}</p><div class="grow top">${status}${extra}${today}</div>${tabbar()}</div>`;
+  const note = (title, sub, yes, no, icon = "phone") => `<div class="note"><b>${title}</b><span>${sub}</span><div class="acts"><span class="pill">${icon ? ic(icon) : ""}${yes}</span><span class="pill line">${no}</span></div></div>`;
+  const cSay = (text, opts, state = "speaking", extra = "", q = "") => `<div class="phone"><div class="grow">${asked(q)}${orb(state, 7.5)}<p class="p-said said">${text}</p>${extra}</div>${say(opts)}</div>`;
+  const sw = (on) => `<span class="switch${on ? " on" : ""}" aria-hidden="true"></span>`;
+  const cLinked = `<div class="phone"><p class="p-hello">How you're told</p><div class="grow top">${tag("Linked to Grete")}<ul class="prefs">
+    <li><div>Urgent: push and call<span>Help, no answer</span></div>${sw(true)}</li>
+    <li><div>Everything else: daily summary<span>At 19:00</span></div>${sw(true)}</li>
+    <li><div>Quiet hours<span>22:00 to 7:00, urgent still rings</span></div>${sw(true)}</li>
+    <li><div>Backup contact<span>Anna, if you don't react in 10 min</span></div>${sw(true)}</li>
+  </ul></div><span class="big">Done</span></div>`;
+
+  const G = ['<span class="who g">G</span>', "Grete, senior"], JO = ['<span class="who">J</span>', "Jonas, caregiver"];
+  const CL = [orb("idle", 1.75), "Claudia"];
+  const GP = "Grete's phone", JP = "Jonas's phone";
+  const fine = tag("At home since 11:20");
+
+  const F = window.F = [
+    { name: "Set up", title: "Set up by talking", steps: [
+      { who: CL, dev: GP, t: "Claudia says hello", why: "First launch. No forms, no password: Claudia asks who is there.", html: gVoice("Hello, I'm Claudia. Nice to meet you. Are you the senior, or are you helping someone? And what's your name?", ["I'm Grete", "I'm helping"]) },
+      { who: G, dev: GP, t: "Grete introduces herself", why: "She just talks. Claudia picks out her role and name.", html: hear("I'm Grete. I live here on my own.") },
+      { who: CL, dev: GP, t: "What may the family see?", why: "Grete chooses how much Jonas and Anna are told, in plain words. Claudia says what the lowest level means, also in an emergency.", html: gVoice("Grete, what may your family know? Everything, a few things, or you decide each time. If you decide each time, they hear nothing without you, not even in an emergency.", ["Everything", "A few things", "I decide"], "speaking", "", "I'm Grete. I live here on my own."), ex: true },
+      { who: G, dev: GP, t: "Grete chooses", why: "Her choice and the time are logged. She can change it any time.", html: hear("A few things.") },
+      { who: CL, dev: GP, t: "Claudia gives the family code", why: "Six characters instead of a password. Grete reads it to Jonas or sends it.", html: gVoice("Done: a few things. This is your family code for Jonas.", ["Send it to Jonas", "Say it again"], "speaking", `<span class="code">MD-7492</span>`, "A few things.") },
+      { who: JO, dev: JP, t: "Jonas joins by voice", why: "His app asks the same question. He says who he is and the code.", html: hear("I'm her son Jonas. The code is M D 7 4 9 2.") },
+      { who: JO, dev: JP, t: "Jonas chooses how he is told", why: "Channel, timing, quiet hours and a backup. Urgent things always get through.", html: cLinked, ex: true },
+    ] },
+    { name: "Ask anything", title: "When does the pharmacy close?", steps: [
+      { who: G, dev: GP, t: "Grete asks a question", why: "An everyday question, not about health. Wake word and question in one breath.", html: hear("Hey Claudia, when does the pharmacy close today?") },
+      { who: CL, dev: GP, t: "Claudia answers in two sentences", why: "Short and calm, then one useful offer. The question is saved in her diary.", html: gVoice("The Rats-Apotheke closes at six today. Shall I put a visit in your calendar?", ["Yes, at four", "No, thanks"], "speaking", "", "Hey Claudia, when does the pharmacy close today?"), ex: true },
+      { who: G, dev: GP, t: "Grete says when", why: "A spoken answer is enough.", html: hear("Yes, at four.") },
+      { who: CL, dev: GP, t: "It's in the calendar", why: "Claudia repeats what she saved, so Grete can correct it.", html: gSay("Done: pharmacy today at four. I'll remind you at half past three.", "speaking", tag("Pharmacy, today 16:00"), "Yes, at four.") },
+      { who: CL, dev: GP, t: "If the internet is down", why: "One calm sentence. The question is still saved, and Claudia tries again by herself.", html: gSay("I can't get online right now. Please tell Jonas. I'll try again in a few minutes.", "speaking", tag("No internet", "amber"), "Hey Claudia, when does the pharmacy close today?") },
+    ] },
+    { name: "Health question", title: "Can I take two?", steps: [
+      { who: G, dev: GP, t: "Grete asks about her tablets", why: "A health question. Claudia never gives medical advice.", html: hear("Hey Claudia, can I take two of my blood pressure tablets?") },
+      { who: CL, dev: GP, t: "Claudia says no, kindly", why: "No diagnosis, no dosage. She offers a doctor instead.", html: gVoice("I can't tell you that. Shall I book a doctor's appointment, or would you like to talk to a doctor now?", ["Book a visit", "Talk to a doctor"], "speaking", "", "Hey Claudia, can I take two of my blood pressure tablets?") },
+      { who: G, dev: GP, t: "Grete wants a doctor now", why: "Only offered because telemedicine was switched on at setup.", html: hear("Talk to a doctor, please.") },
+      { who: CL, dev: GP, t: "Claudia asks for consent", why: "Grete agrees every time before anything is handed over.", html: gVoice("I'll connect you to a certified doctor and tell them your question. Is that all right?", ["Yes", "No"], "speaking", "", "Talk to a doctor, please.") },
+      { who: G, dev: GP, t: "The doctor takes over", why: "A video or phone call on speaker. Telemedicine is not an emergency channel; help goes through “Hey Claudia, help!”.", html: gDoctor, ex: true },
+    ] },
+    { name: "Diary", title: "Shall I tell Jonas?", steps: [
+      { who: G, dev: GP, t: "Grete mentions something", why: "Everything Grete says is kept in her diary, in the app.", html: hear("Hey Claudia, I slept badly again. My back hurts.") },
+      { who: CL, dev: GP, t: "Claudia asks before sharing", why: "Claudia thinks Jonas should know, so she asks right away. Nothing sensitive goes out without a yes.", html: gVoice("I'm sorry, Grete. I've written it down. Shall I tell Jonas?", ["Yes, tell him", "No, keep it"], "speaking", "", "Hey Claudia, I slept badly again. My back hurts.") },
+      { who: G, dev: GP, t: "Grete says yes", why: "If she says no or nothing, it stays private.", html: hear("Yes, tell him.") },
+      { who: CL, dev: JP, t: "Jonas gets a short summary", why: "A summary in the notes, not the conversation.", html: cToday("Grete is doing fine", fine, note("Grete shared a note", "Slept badly again, her back hurts. 9:12", "Call Grete", "Seen")) },
+      { who: G, dev: GP, t: "Grete keeps control", why: "She can hear her diary and delete entries by voice. She sees what was shared.", html: gDiary },
+    ] },
+    { name: "Change a setting", title: "Eight is too early", steps: [
+      { who: G, dev: GP, t: "Grete wants a change", why: "Reminder times are Grete's to change.", html: hear("Hey Claudia, eight is too early for my reminder.") },
+      { who: CL, dev: GP, t: "Claudia checks back", why: "Every change by voice is read back before it counts.", html: gVoice("Shall I move your morning reminder to nine?", ["Yes", "Half past eight"], "speaking", "", "Hey Claudia, eight is too early for my reminder.") },
+      { who: G, dev: GP, t: "Grete asks for more", why: "This one is Jonas's to decide: Grete can't switch off location sharing herself.", html: hear("Yes. And stop showing Jonas where I am.") },
+      { who: CL, dev: GP, t: "Claudia sends it to Jonas", why: "A request for a caregiver setting becomes a pending approval, and Grete is told so.", html: gSay("Your reminder is at nine now. Location is for Jonas to change; I've asked him.", "speaking", tag("Waiting for Jonas", "grey"), "Yes. And stop showing Jonas where I am.") },
+      { who: CL, dev: JP, t: "Jonas decides", why: "One card with Grete's words. Which setting belongs to whom is still open.", html: cToday("Grete is doing fine", fine, note("Grete asks: stop sharing her location", "“Stop showing Jonas where I am.” 10:05", "Approve", "Call Grete", "")), ex: true },
+    ] },
+    { name: "Feeling lonely", title: "Nobody called today", steps: [
+      { who: CL, dev: GP, t: "Claudia checks in", why: "At 19:00, the check-in time Grete chose. She listens for how Grete sounds.", html: gVoice("Good evening, Grete. How was your day?", ["Fine", "Quiet"], "listening") },
+      { who: G, dev: GP, t: "Grete sounds low", why: "Claudia hears loneliness in the answer, not in a score.", html: hear("Quiet. Nobody called today.") },
+      { who: CL, dev: GP, t: "Claudia offers", why: "She asks first. Nothing is sent without Grete.", html: gVoice("Shall I let your children know you'd enjoy a chat?", ["Yes", "No"], "speaking", "", "Quiet. Nobody called today.") },
+      { who: G, dev: GP, t: "Grete says no, shyly", why: "She doesn't want to be a bother.", html: hear("No, they're busy.") },
+      { who: CL, dev: GP, t: "One gentle second ask", why: "Only once, without pressure. A clear no is respected: no alert.", html: gVoice("Just a friendly hello from you? Or would you rather have your peace today?", ["A hello is nice", "My peace"], "speaking", "", "No, they're busy.") },
+      { who: G, dev: GP, t: "Grete agrees", why: "Her yes counts. Claudia sends the hello right away.", html: hear("Well, a hello would be nice.") },
+      { who: CL, dev: JP, t: "Jonas gets a warm nudge", why: "Not an alarm: a friendly card with one action.", html: cToday("Grete is doing fine", fine, note("Grete would enjoy a chat tonight", "She sends you a hello. 19:04", "Call Grete", "Later")) },
+    ] },
+  ];
+
+  let f = 0, i = 0;
+  const $ = (id) => document.getElementById(id);
+  const picker = $("picker");
+  picker.innerHTML = F.map((x, k) => `<button type="button" data-f="${k}"><span>${k + 1}</span>${x.name}</button>`).join("");
+  const render = () => {
+    const flow = F[f], s = flow.steps[i];
+    picker.querySelectorAll("button").forEach((b, k) => b.setAttribute("aria-pressed", k === f));
+    $("flow-title").textContent = flow.title;
+    $("count").textContent = `Flow ${f + 1} of ${F.length}, step ${i + 1} of ${flow.steps.length}`;
+    $("actor").innerHTML = s.who[0] + s.who[1];
+    $("step-title").textContent = s.t;
+    $("step-why").textContent = s.why;
+    $("example").hidden = !s.ex;
+    $("dev-label").textContent = s.dev;
+    document.querySelector(".device").dataset.theme = s.dev === GP ? "light" : "dark";
+    $("dev").innerHTML = s.html;
+    $("dots").innerHTML = flow.steps.map((_, k) => `<button type="button" data-k="${k}"${k === i ? ' aria-current="step"' : ""} aria-label="Step ${k + 1}">${k + 1}</button>`).join("");
+    $("prev").disabled = f === 0 && i === 0;
+    $("next").textContent = i < flow.steps.length - 1 ? "Next" : f < F.length - 1 ? "Next flow" : "Start over";
+    history.replaceState(null, "", `#${f + 1}-${i + 1}`);
+  };
+  const go = (nf, ni) => { f = nf; i = ni; render(); };
+  const next = () => (i < F[f].steps.length - 1 ? go(f, i + 1) : go((f + 1) % F.length, 0));
+  const prev = () => (i > 0 ? go(f, i - 1) : f > 0 ? go(f - 1, F[f - 1].steps.length - 1) : null);
+  picker.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) go(+b.dataset.f, 0); });
+  $("dots").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) go(f, +b.dataset.k); });
+  $("next").addEventListener("click", next);
+  $("prev").addEventListener("click", prev);
+  addEventListener("keydown", (e) => { if (e.key === "ArrowRight") next(); if (e.key === "ArrowLeft") prev(); });
+  const read = () => {
+    const m = location.hash.match(/^#(\d+)(?:-(\d+))?$/);
+    if (!m) return render();
+    const nf = Math.min(F.length, Math.max(1, +m[1])) - 1;
+    go(nf, Math.min(F[nf].steps.length, Math.max(1, +(m[2] || 1))) - 1);
+  };
+  addEventListener("hashchange", read);
+  read();
+})();
+</script>
+</body>
+</html>
