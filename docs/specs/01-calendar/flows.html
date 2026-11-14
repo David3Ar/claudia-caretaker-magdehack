@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calendar Flows</title>
+<meta name="description" content="The six calendar flows of Claudia, step by step. Pick a flow, then go through it screen by screen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@1,6..72,400&display=swap">
+<style>
+/* Tokens and components follow docs/design.html */
+:root {
+  --paper: #ffffff; --mist: #edf1ef; --ink: #000000; --ink-soft: #5c6662;
+  --lime: #c6f432; --amber: #ffb23e; --coral: #ff5a3c; --hair: rgb(0 0 0 / 0.12);
+  --sans: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: Newsreader, Georgia, serif;
+  --r-s: 0.75rem; --r-m: 1.5rem; --r-l: 2.75rem;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-family: var(--sans); color: var(--ink); background: var(--paper); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4, h5, p, ul, ol, dl, dd { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.soft { color: var(--ink-soft); }
+.num { font-variant-numeric: tabular-nums; }
+.said { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+svg.i { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* Page */
+.page { max-width: 86rem; margin: 0 auto; padding: 1.5rem clamp(1rem, 4vw, 3rem) 3rem; display: grid; gap: 1.5rem; }
+.head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem; }
+.brand { display: flex; align-items: center; gap: 0.625rem; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.03em; margin-right: auto; }
+.head a { color: var(--ink); }
+.picker { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.picker button { border: 0; padding: 0.625rem 1.125rem; border-radius: 99rem; background: var(--mist); font-weight: 600; text-align: left; }
+.picker button span { color: var(--ink-soft); font-weight: 400; margin-right: 0.375rem; }
+.picker button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.picker button[aria-pressed="true"] span { color: rgb(255 255 255 / 0.65); }
+
+/* Stage: text and controls left, device right */
+.stage { display: grid; grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 4rem); align-items: start; }
+.info { display: grid; gap: 1.25rem; position: sticky; top: 1.5rem; }
+.info h1 { font-size: clamp(2.25rem, 4.4vw, 3.75rem); font-weight: 800; letter-spacing: -0.05em; line-height: 0.95; }
+.count { font-size: 1.0625rem; color: var(--ink-soft); }
+.actor { display: inline-flex; align-items: center; gap: 0.5rem; justify-self: start; padding: 0.25rem 0.875rem 0.25rem 0.25rem; border-radius: 99rem; background: var(--mist); font-weight: 600; }
+.actor .who, .actor .orb { --s: 1.75rem; width: 1.75rem; height: 1.75rem; }
+.info h2 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+.info .why { color: var(--ink-soft); max-width: 34ch; font-size: 1.0625rem; }
+.example[hidden] { display: none; }
+.example { display: inline-block; padding: 0.125rem 0.625rem; border-radius: 99rem; box-shadow: inset 0 0 0 1px var(--hair); font-size: 0.875rem; color: var(--ink-soft); justify-self: start; }
+.nav { display: flex; align-items: center; gap: 0.5rem; }
+.dots { display: flex; gap: 0.25rem; margin: 0 0.5rem; }
+.dots button { width: 2rem; height: 2rem; border: 0; border-radius: 50%; background: var(--mist); font-weight: 600; font-size: 0.875rem; }
+.dots button[aria-current="step"] { background: var(--ink); color: var(--paper); }
+.hint { font-size: 0.875rem; color: var(--ink-soft); }
+.device { display: grid; justify-items: center; gap: 0.875rem; min-width: 0; }
+.device > p { font-size: 0.9375rem; color: var(--ink-soft); }
+
+/* Components from design.html */
+.orb { --s: 10rem; position: relative; width: var(--s); height: var(--s); flex: none; border-radius: 50%; display: grid; place-items: center; isolation: isolate; }
+.orb::before { content: ""; position: absolute; inset: 0; z-index: -2; border-radius: 50%; background: conic-gradient(var(--lime), var(--amber), var(--coral), var(--amber), var(--lime)); filter: blur(calc(var(--s) * 0.055)); animation: spin 14s linear infinite; }
+.orb::after { content: ""; position: absolute; inset: 7%; z-index: -1; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #ffffff, #e6eae8 75%); }
+.bars { display: flex; align-items: center; gap: calc(var(--s) * 0.045); height: calc(var(--s) * 0.32); }
+.bars i { width: calc(var(--s) * 0.055); height: 100%; border-radius: 99rem; background: var(--ink); transform: scaleY(0.17); }
+.orb[data-state="idle"] .bars { opacity: 0.35; }
+.orb[data-state="listening"]::after { inset: 13%; }
+.orb[data-state="listening"]::before { animation: spin 14s linear infinite, breathe 1.6s ease-in-out infinite; }
+.orb[data-state="thinking"]::before { animation-duration: 2.2s; }
+.orb[data-state="thinking"]::after { inset: 4%; }
+.orb[data-state="thinking"] .bars i { animation: hop 0.9s ease-in-out infinite; }
+.orb[data-state="speaking"] .bars i { animation: talk 0.7s ease-in-out infinite alternate; }
+.bars i:nth-child(2) { animation-delay: -0.45s !important; }
+.bars i:nth-child(3) { animation-delay: -0.2s !important; }
+.bars i:nth-child(4) { animation-delay: -0.6s !important; }
+.bars i:nth-child(5) { animation-delay: -0.3s !important; }
+@keyframes spin { to { rotate: 1turn; } }
+@keyframes breathe { 50% { scale: 1.09; } }
+@keyframes talk { from { transform: scaleY(0.2); } to { transform: scaleY(1); } }
+@keyframes hop { 0%, 100% { transform: scaleY(0.17) translateY(0); } 50% { transform: scaleY(0.17) translateY(-160%); } }
+
+.phone { width: 20rem; max-width: 100%; aspect-ratio: 9 / 18.5; border: 2px solid var(--ink); border-radius: var(--r-l); background: var(--paper); padding: 1.25rem 1.125rem 1.125rem; display: flex; flex-direction: column; gap: 0.875rem; overflow: hidden; }
+.phone::before { content: ""; align-self: center; width: 4.5rem; height: 1.125rem; border-radius: 99rem; background: var(--ink); flex: none; }
+.phone.dark { background: var(--ink); color: var(--paper); }
+.phone.dark::before { background: #262626; }
+.phone.lock { background: var(--mist); }
+.grow { flex: 1; display: grid; place-items: center; align-content: center; gap: 1.25rem; text-align: center; min-height: 0; }
+.grow.left { justify-items: start; text-align: left; }
+.grow.top { align-content: start; justify-items: stretch; text-align: left; gap: 0.875rem; }
+.p-hello { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+.p-said { font-size: 1.5rem; line-height: 1.15; }
+.p-heard { font-size: 1.4375rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+.listening { font-size: 0.9375rem; color: rgb(255 255 255 / 0.6); text-align: center; }
+.clock { font-size: 3.5rem; font-weight: 700; letter-spacing: -0.05em; line-height: 1; text-align: center; margin-top: 1.5rem; }
+.push { display: grid; gap: 0.25rem; padding: 0.875rem 1rem; border-radius: var(--r-m); background: var(--paper); line-height: 1.25; text-align: left; box-shadow: 0 0 0 2px var(--ink); }
+.push b { display: flex; align-items: center; gap: 0.5rem; }
+.push .orb { --s: 1.5rem; }
+.big { display: flex; align-items: center; justify-content: center; gap: 0.625rem; width: 100%; min-height: 4rem; padding: 0.75rem 1rem; border-radius: var(--r-m); background: var(--ink); color: var(--paper); font-size: 1.25rem; font-weight: 700; text-align: center; line-height: 1.1; flex: none; }
+.big.sos { background: var(--coral); color: var(--ink); }
+.big.yes { background: var(--lime); color: var(--ink); }
+.big.ghost { background: none; color: inherit; box-shadow: inset 0 0 0 2px currentColor; }
+.big.mid { min-height: 3.25rem; font-size: 1.0625rem; }
+.tag { justify-self: start; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 99rem; background: var(--paper); box-shadow: inset 0 0 0 1px var(--hair); font-size: 0.9375rem; font-weight: 500; }
+.tag::before { content: ""; width: 0.625rem; height: 0.625rem; border-radius: 50%; background: var(--dot, var(--lime)); box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35); flex: none; }
+.who { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 0.8125rem; font-weight: 700; flex: none; }
+.who.b { background: var(--mist); color: var(--ink); box-shadow: inset 0 0 0 1px var(--hair); }
+.who.g { background: var(--lime); color: var(--ink); }
+.who.none { background: none; color: var(--ink); border: 1.5px dashed var(--ink); }
+.rows li { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid var(--hair); line-height: 1.25; }
+.rows li:last-child { border-bottom: 0; }
+.rows .t { width: 3.5rem; flex: none; font-weight: 600; }
+.rows .what { flex: 1; min-width: 0; }
+.rows .what span { display: block; color: var(--ink-soft); font-size: 0.875rem; }
+.rows .said { font-size: 1.125rem; line-height: 1.2; }
+.sum { display: grid; grid-template-columns: auto 1fr; gap: 0 1rem; font-size: 0.9375rem; }
+.sum dt, .sum dd { padding: 0.5rem 0; border-top: 1px solid var(--hair); }
+.sum dt { color: var(--ink-soft); }
+.sum dd { font-weight: 600; }
+.pick { display: flex; gap: 0.5rem; }
+.pick > span { flex: 1; display: grid; justify-items: center; gap: 0.25rem; padding: 0.625rem 0.25rem; border-radius: var(--r-s); background: var(--mist); font-size: 0.8125rem; line-height: 1.2; text-align: center; }
+.pick > span.on { background: var(--ink); color: var(--paper); }
+.pick > span.on .who { background: var(--lime); color: var(--ink); }
+.tabbar { display: flex; align-items: center; justify-content: space-between; padding: 0 0.75rem; flex: none; }
+.tabbar .mic { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: var(--ink); color: var(--paper); font-size: 1.125rem; }
+.tabbar .side { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--mist); }
+
+/* Family calendar: the week view from design.html */
+.screen { width: 100%; max-width: 56rem; }
+.calendar { background: var(--mist); border-radius: var(--r-l); padding: clamp(0.75rem, 2vw, 1.5rem); display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.625rem; }
+.cal-top { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.5rem 1.5rem; padding: 0.25rem 0.5rem; }
+.cal-top h3 { font-size: 2rem; font-weight: 700; letter-spacing: -0.045em; line-height: 1; margin-right: auto; }
+.legend { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; font-size: 0.875rem; color: var(--ink-soft); }
+.legend span::before { content: ""; display: inline-block; width: 0.625rem; height: 0.625rem; margin-right: 0.375rem; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1px rgb(0 0 0 / 0.3); }
+.wk-label { padding: 0.25rem 0.5rem 0; font-size: 0.875rem; color: var(--ink-soft); }
+.week-scroll { overflow-x: auto; border-radius: var(--r-m); }
+.wk { display: grid; grid-template-columns: repeat(7, minmax(6.5rem, 1fr)); gap: 0.375rem; min-width: 47rem; }
+.day { background: var(--paper); border-radius: var(--r-s); padding: 0.625rem 0.375rem; min-height: 11rem; display: flex; flex-direction: column; gap: 0.375rem; }
+.day:first-child { border-radius: var(--r-m) var(--r-s) var(--r-s) var(--r-m); }
+.day:last-child { border-radius: var(--r-s) var(--r-m) var(--r-m) var(--r-s); }
+.day h5 { margin: 0 0.25rem; font-size: 0.875rem; font-weight: 400; color: var(--ink-soft); line-height: 1.1; }
+.day h5 b { display: block; font-size: 1.75rem; font-weight: 700; letter-spacing: -0.05em; color: var(--ink); }
+.day.now { background: var(--ink); }
+.day.now h5, .day.now h5 b { color: var(--paper); }
+.ev { display: grid; gap: 0.125rem; padding: 0.4375rem 0.5rem; border: 0; border-radius: var(--r-s); background: var(--mist); font-size: 0.8125rem; line-height: 1.2; text-align: left; width: 100%; }
+.ev b { font-size: 0.875rem; overflow-wrap: anywhere; }
+.ev .by { display: flex; align-items: center; gap: 0.375rem; margin-top: 0.125rem; min-width: 0; overflow-wrap: anywhere; }
+.ev .who { width: 1.375rem; height: 1.375rem; font-size: 0.6875rem; }
+.ev.done, .ev.rem { background: var(--lime); }
+.ev.moved { background: var(--amber); }
+.ev.missed { background: var(--coral); }
+.ev.new { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--ink); }
+.day.now .ev:not(.done):not(.moved):not(.missed) { background: var(--paper); }
+.with-detail { position: relative; min-height: 37rem; }
+.with-detail .one { position: absolute; top: 0; right: 0; width: 18.5rem; box-shadow: 0 0 0 2px var(--ink); }
+.one { background: var(--paper); border-radius: var(--r-m); padding: 1rem; display: grid; gap: 0.625rem; }
+.one h4 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+.one dl { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); font-size: 0.9375rem; }
+.one dt, .one dd { padding: 0.5rem 0; border-top: 1px solid var(--hair); display: flex; align-items: center; min-height: 2.5rem; line-height: 1.2; }
+.one dt { color: var(--ink-soft); padding-right: 0.75rem; font-size: 0.875rem; }
+.one dd { font-weight: 600; gap: 0.5rem; }
+.one dd.said { display: block; font-weight: 400; font-size: 1.0625rem; }
+.one .mark { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--ink); border-radius: var(--r-s); }
+.check { width: 1.5rem; height: 1.5rem; border-radius: 0.375rem; background: var(--ink) no-repeat center / 1rem url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c6f432' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 12 6 6L20 6'/%3E%3C/svg%3E"); flex: none; }
+.drop { display: grid; width: 100%; border-radius: var(--r-s); background: var(--mist); overflow: hidden; font-size: 0.9375rem; }
+.drop span { padding: 0.4375rem 0.75rem; font-weight: 500; }
+.drop .sel { background: var(--ink); color: var(--paper); }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } .orb[data-state="speaking"] .bars i:nth-child(odd) { transform: scaleY(0.9); } .orb[data-state="speaking"] .bars i:nth-child(even) { transform: scaleY(0.5); } }
+@media (max-width: 60rem) {
+  .stage { grid-template-columns: minmax(0, 1fr); }
+  .info { position: static; }
+  .with-detail { min-height: 0; display: grid; gap: 0.625rem; }
+  .with-detail .one { position: static; width: auto; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.500 1.500a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+</svg>
+
+<div class="page">
+  <header class="head">
+    <span class="brand"><span class="orb" style="--s:1.75rem" data-state="idle"></span>Claudia, calendar flows</span>
+    <a href="spec.md">Spec</a>
+    <a href="../../design.html">Design</a>
+  </header>
+  <nav class="picker" id="picker" aria-label="Flow"></nav>
+  <main class="stage">
+    <section class="info" aria-live="polite">
+      <h1 id="flow-title"></h1>
+      <p class="count" id="count"></p>
+      <span class="actor" id="actor"></span>
+      <h2 id="step-title"></h2>
+      <p class="why" id="step-why"></p>
+      <span class="example" id="example" hidden>Example content, not from the script</span>
+      <div class="nav">
+        <button type="button" class="big mid ghost" id="prev" style="width:auto;padding:0 1.25rem">Back</button>
+        <div class="dots" id="dots"></div>
+        <button type="button" class="big mid" id="next" style="width:auto;padding:0 1.5rem">Next</button>
+      </div>
+      <p class="hint">Arrow keys work too. People, dates and places are made up.</p>
+    </section>
+    <section class="device">
+      <p id="dev-label"></p>
+      <div id="dev" style="display:contents"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+(() => {
+  const ic = (n) => `<svg class="i"><use href="#i-${n}"/></svg>`;
+  const orb = (state, s) => `<div class="orb" data-state="${state}" style="--s:${s}rem" aria-hidden="true"><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>`;
+  const fixed = `<span class="big">${ic("phone")}Call Jonas</span><span class="big sos">Emergency</span>`;
+  const tabbar = `<div class="tabbar"><span class="side">${ic("cal")}</span><span class="mic">${ic("mic")}</span><span class="side">${ic("plus")}</span></div>`;
+  const tag = (t, dot) => `<span class="tag"${dot ? ` style="--dot:var(--${dot})"` : ""}>${t}</span>`;
+
+  // Screens
+  const hear = (text) => `<div class="phone dark"><div class="grow">${orb("listening", 9.5)}<p class="p-heard">${text}</p></div><p class="listening">Listening</p></div>`;
+  const gSay = (text, state = "speaking", extra = "") => `<div class="phone"><div class="grow">${orb(state, 7.5)}<p class="p-said said">${text}</p>${extra}</div>${fixed}</div>`;
+  const gAsk = (text, yes, no) => `<div class="phone"><div class="grow left">${orb("speaking", 4.5)}<p class="p-said said">${text}</p></div><span class="big yes">${yes}</span><span class="big ghost">${no}</span><span class="big sos">Emergency</span></div>`;
+  const cSay = (text, extra = "", state = "speaking") => `<div class="phone"><div class="grow">${orb(state, 6.5)}<p class="p-said said">${text}</p>${extra}</div>${tabbar}</div>`;
+  const cAsk = (text, yes, no, extra = "") => `<div class="phone"><div class="grow left">${orb("speaking", 4)}<p class="p-said said" style="font-size:1.3125rem">${text}</p>${extra}</div><span class="big mid yes">${yes}</span><span class="big mid ghost">${no}</span></div>`;
+  const cCard = (title, body) => `<div class="phone"><p class="p-hello">${title}</p><div class="grow top">${body}</div>${tabbar}</div>`;
+  const lock = (text) => `<div class="phone lock"><p class="clock num">9:00</p><div class="grow top" style="margin-top:1.5rem"><div class="push"><b>${orb("idle", 1.5)}Claudia<span class="soft" style="font-weight:400;margin-left:auto">now</span></b>${text}</div></div></div>`;
+
+  const ev = (t, title, by, cls = "") => `<p class="ev ${cls}"><span class="num">${t}</span><b>${title}</b><span class="by">${by}</span></p>`;
+  const A = '<span class="who b">A</span>', J = '<span class="who">J</span>';
+  const day = (n, d, evs = "", now = false) => `<div class="day${now ? " now" : ""}"><h5>${now ? "Today" : n}<b class="num">${d}</b></h5>${evs}</div>`;
+  const week = (days) => `<div class="week-scroll"><div class="wk">${days.join("")}</div></div>`;
+  const cal = (title, body, legend = "") => `<div class="screen"><div class="calendar"><div class="cal-top"><h3>${title}</h3>${legend}</div>${body}</div></div>`;
+  const legend = `<p class="legend"><span style="--c:var(--lime)">Took place</span><span style="--c:var(--amber)">Rescheduled</span><span style="--c:var(--coral)">Missed</span><span style="--c:var(--mist)">Planned</span></p>`;
+
+  const dentistWeek = (who, by) => week([
+    day("Mon", 19, ev("10:00", "Physio", A + "Anna drives")),
+    day("Tue", 20, ev("9:00", "Reminder for Grete", "Dentist in 3 days", "rem")),
+    day("Wed", 21),
+    day("Thu", 22, ev("9:00", "Reminder for Grete", "Dentist tomorrow", "rem")),
+    day("Fri", 23, ev("10:30", "Dentist", who + by, "new")),
+    day("Sat", 24, ev("15:00", "Coffee with Helga", "Grete added this")),
+    day("Sun", 25),
+  ]);
+  const twoWeeks = (pressed) => `
+    <p class="wk-label">Last week</p>${week([
+      day("Mon", 5, ev("10:00", "Physio", A + "Praxis am Dom", "done")),
+      day("Tue", 6, ev("11:00", "Foot care", A + "Podologie Nord", "done")),
+      day("Wed", 7, ev("9:00", "Eye doctor", J + "Augenzentrum", "moved")),
+      day("Thu", 8, ev("17:00", "Jonas visits", J + "At home", "done")),
+      day("Fri", 9, ev("8:30", "Blood test", A + "Hausarztpraxis", "missed")),
+      day("Sat", 10, ev("15:00", "Coffee with Helga", "At home", "done")),
+      day("Sun", 11),
+    ])}
+    <p class="wk-label">This week</p>${week([
+      day("Mon", 12, ev("10:00", "Physio", A + "Praxis am Dom", "done")),
+      day("Tue", 13, ev("10:00", "Hairdresser", J + "Salon Breiter Weg", "done")),
+      day("Wed", 14, ev("14:30", "Doctor", A + "Hausarztpraxis"), true),
+      day("Thu", 15, ev("10:30", "Dentist", J + "Zahnarztpraxis", pressed ? "new" : "")),
+      day("Fri", 16, ev("17:00", "Jonas visits", J + "At home")),
+      day("Sat", 17, ev("15:00", "Coffee with Helga", "At home")),
+      day("Sun", 18),
+    ])}`;
+  const detail = (mark) => `<div class="one">${tag("Planned", "mist")}<h4>Dentist</h4><dl>
+    <dt>When</dt><dd>Thu 15 Nov, 10:30</dd>
+    <dt>Where</dt><dd>Zahnarztpraxis</dd>
+    <dt>Assigned</dt><dd>${J}Jonas</dd>
+    <dt>Repetition</dt><dd>Every year</dd>
+    <dt>Reminders</dt><dd>3 days before, the day before</dd>
+    <dt>Type</dt><dd>Doctor's appointment</dd>
+    <dt>Questions for this type</dt><dd class="said">How did the check go?<br>Is there anything to follow up?</dd>
+    <dt>Document result</dt><dd${mark ? ' class="mark"' : ""}><span class="check"></span>Yes</dd>
+    <dt>Documentation location</dt><dd${mark ? ' class="mark"' : ""}>${mark ? '<span class="drop"><span>Notification only</span><span class="sel">Add to diary</span></span>' : "Add to diary"}</dd>
+  </dl></div>`;
+
+  const G = ['<span class="who g">G</span>', "Grete, senior"], JO = ['<span class="who">J</span>', "Jonas, caregiver"], AN = ['<span class="who b">A</span>', "Anna, caregiver"];
+  const CL = [orb("idle", 1.75), "Claudia"];
+  const GP = "Grete's phone", JP = "Jonas's phone", AP = "Anna's phone", FC = "Family calendar, web dashboard";
+
+  const F = [
+    { name: "Next appointment", title: "When is my next dentist appointment?", steps: [
+      { who: G, dev: GP, t: "Grete asks", why: "She says it out loud. The screen turns black and shows her words.", html: hear("Hey Claudia, when is my next dentist appointment, and who could bring me?") },
+      { who: CL, dev: GP, t: "Claudia checks", why: "She looks in the shared calendar.", html: gSay("Let me check.", "thinking") },
+      { who: CL, dev: GP, t: "Claudia answers", why: "Exact date and time, and who already accepted.", html: gSay("Friday, 23 November at 10:30. Your son Jonas already accepted and will bring you.") },
+      { who: CL, dev: GP, t: "Claudia offers reminders", why: "One question, answered by voice or with a button.", html: gAsk("I'll remind you three days in advance and the day before. Is that okay?", "Yes, that's fine", "No") },
+      { who: G, dev: GP, t: "Grete confirms", why: "A spoken yes is enough.", html: hear("Yes, that's fine.") },
+      { who: CL, dev: FC, t: "Reminders are saved", why: "The family sees the appointment, who brings Grete, and both reminders.", html: cal("19 to 25 November", dentistWeek(J, "Jonas brings her")) },
+    ] },
+    { name: "Appointment check", title: "How did Mum's appointment go?", steps: [
+      { who: AN, dev: AP, t: "Anna asks", why: "Any caregiver can ask about an appointment they were not at.", html: hear("Hey Claudia, my mum had a dentist appointment today. Could you check?") },
+      { who: CL, dev: AP, t: "Claudia finds it", why: "She knows who was responsible.", html: cSay("Yes, found it. Your brother Jonas brought her.", tag("Dentist, today 10:30")) },
+      { who: CL, dev: AP, t: "Claudia reports the result", why: "Read from the documents uploaded after the visit.", html: cSay("According to the uploaded documents the check went well. Everything is fine, no action needed.", tag("Took place")) },
+      { who: CL, dev: AP, t: "Claudia plans the follow-up", why: "The next check-up is proposed right away.", html: cAsk("The next check-up is in one year. Do you want me to assign it now, or ask one month before?", "Assign it now", "Ask one month before") },
+      { who: AN, dev: AP, t: "Anna decides", why: "Nobody has to plan a year ahead.", html: hear("Ask one month before."), ex: true },
+      { who: CL, dev: AP, t: "Follow-up is noted", why: "Claudia comes back to it by herself. That is the next flow.", html: cCard("Dentist check-up", `${tag("Claudia asks one month before")}<dl class="sum"><dt>When</dt><dd>In one year</dd><dt>Assigned</dt><dd>Nobody yet</dd><dt>Claudia asks</dt><dd>One month before</dd></dl>`), ex: true },
+    ] },
+    { name: "Assign a caregiver", title: "Who takes the next appointment?", steps: [
+      { who: CL, dev: AP, t: "Claudia notifies", why: "One month before, as agreed in the last flow.", html: lock("Hey, dentist appointment in one month. Tap here to assign the task.") },
+      { who: CL, dev: AP, t: "Claudia suggests who is free", why: "The notification opens the companion app. Claudia has compared everyone's timetable.", html: cAsk("I checked all the connected timetables. It seems you'll have time while the others will be busy. Will you take the responsibility?", "Yes, I'll take it", "Not this time", `<div class="pick" style="align-self:stretch;width:100%"><span class="on"><span class="who">A</span>Anna<br>free</span><span><span class="who">J</span>Jonas<br>busy</span></div>`) },
+      { who: AN, dev: AP, t: "Anna accepts", why: "By voice or with the button.", html: hear("Yes, can do that.") },
+      { who: CL, dev: AP, t: "Claudia confirms", why: "One answer updates both calendars.", html: cSay("Great, I'll add this to Grete's calendar and sync it with your private calendar too.", `${tag("In Grete's calendar")}${tag("In your private calendar")}`) },
+      { who: CL, dev: FC, t: "Appointment is assigned", why: "The family calendar shows Anna as responsible.", html: cal("Dentist week", week([day("Mon", 19, ev("10:00", "Physio", J + "Jonas drives")), day("Tue", 20), day("Wed", 21), day("Thu", 22), day("Fri", 23, ev("10:30", "Dentist", A + "Anna brings her", "new")), day("Sat", 24), day("Sun", 25)])), ex: true },
+    ] },
+    { name: "Daily mood", title: "Ask Mum how she feels, every day", steps: [
+      { who: JO, dev: JP, t: "Jonas asks for a daily task", why: "A recurring question is set up in one sentence.", html: hear("Hey Claudia, could you add a daily task that asks how my mum feels, and add it to the diary?") },
+      { who: CL, dev: JP, t: "Claudia sets it up", why: "The answers get their own place in the diary.", html: cSay("Of course. I will add it to the diary under “Daily Mood” and document it daily.") },
+      { who: CL, dev: JP, t: "Claudia suggests a time", why: "She fits the question into Grete's existing routine.", html: cAsk("At which time do you want me to ask her? I suggest 9 am, after I asked if she took all the pills.", "9 am is good", "Another time") },
+      { who: JO, dev: JP, t: "Jonas confirms", why: "Setup is done.", html: hear("9 am is good."), ex: true },
+      { who: CL, dev: GP, t: "Next morning, Claudia asks Grete", why: "Right after the tablet check, at 9:00.", html: gSay("How do you feel today, Grete?"), ex: true },
+      { who: G, dev: GP, t: "Grete answers", why: "She just talks. Nothing to type or tap.", html: hear("A bit tired, but my knee is better than yesterday."), ex: true },
+      { who: CL, dev: JP, t: "Answer is in the diary", why: "Jonas reads it when he has time. No call needed to know how she is.", html: cCard("Daily Mood", `<ul class="rows"><li><span class="t">Today</span><span class="what said">“A bit tired, but my knee is better than yesterday.”</span></li><li><span class="t">Tue</span><span class="what said">“I slept well.”</span></li><li><span class="t">Mon</span><span class="what said">“Good. Helga called.”</span></li></ul>`), ex: true },
+    ] },
+    { name: "Weekly groceries", title: "Groceries every week, within 50 euro", steps: [
+      { who: JO, dev: JP, t: "Jonas sets the task", why: "Rhythm, budget, shop and follow-up in one request.", html: hear("Hey Claudia, ask my mum every week if she needs groceries. Interview her on her needs and keep the order within 50 euro. Then order at Flink and add the delivery date and a reminder to her calendar.") },
+      { who: CL, dev: JP, t: "Task is saved", why: "Claudia shows what she understood.", html: cCard("Weekly groceries", `${tag("Task saved")}<dl class="sum"><dt>How often</dt><dd>Every week</dd><dt>Claudia does</dt><dd>Interviews Grete</dd><dt>Limit</dt><dd>50 euro per order</dd><dt>Order at</dt><dd>Flink</dd><dt>Afterwards</dt><dd>Delivery date and reminder in Grete's calendar</dd></dl>`), ex: true },
+      { who: CL, dev: GP, t: "Claudia interviews Grete", why: "Once a week she asks what is needed.", html: gSay("Do you need anything from the shop this week?"), ex: true },
+      { who: G, dev: GP, t: "Grete says what she needs", why: "Claudia asks back until the list is complete.", html: hear("Milk, bread, coffee and some apples."), ex: true },
+      { who: CL, dev: JP, t: "Order stays within the limit", why: "Claudia orders only what fits the budget Jonas set.", html: cCard("This week's order", `${tag("Ordered at Flink")}<ul class="rows"><li><span class="what">Milk, bread, coffee, apples<span>4 items from Grete's interview</span></span></li></ul><dl class="sum"><dt>Total</dt><dd>Within the 50 euro limit</dd><dt>Delivery</dt><dd>Friday, 16:00 to 18:00</dd></dl>`), ex: true },
+      { who: CL, dev: FC, t: "Delivery is in the calendar", why: "Grete gets a reminder, the family sees it too.", html: cal("This week", week([day("Mon", 12), day("Tue", 13), day("Wed", 14, ev("14:30", "Doctor", A + "Anna drives"), true), day("Thu", 15), day("Fri", 16, ev("15:30", "Reminder for Grete", "Groceries arrive soon", "rem") + ev("16:00", "Groceries delivered", "Flink, at home", "new")), day("Sat", 17), day("Sun", 18)])), ex: true },
+    ] },
+    { name: "Calendar history", title: "What happened, and what is planned", steps: [
+      { who: JO, dev: FC, t: "Jonas opens the calendar", why: "Past appointments are mostly green, rarely yellow (rescheduled), very rarely red (missed). Future ones are neutral. Each shows who is assigned and where it is.", html: cal("November", twoWeeks(false), legend), ex: true },
+      { who: JO, dev: FC, t: "He clicks an appointment", why: "The detail menu opens: repetition, reminders, type, and the questions Claudia asks for this type.", html: cal("November", `<div class="with-detail"><div>${twoWeeks(true)}</div>${detail(false)}</div>`, legend), ex: true },
+      { who: JO, dev: FC, t: "He chooses how the result is documented", why: "A checkbox to document the result, and where it goes: notification only, or added to the diary.", html: cal("November", `<div class="with-detail"><div>${twoWeeks(true)}</div>${detail(true)}</div>`, legend), ex: true },
+    ] },
+  ];
+
+  let f = 0, i = 0;
+  const $ = (id) => document.getElementById(id);
+  const picker = $("picker");
+  picker.innerHTML = F.map((x, k) => `<button type="button" data-f="${k}"><span>${k + 1}</span>${x.name}</button>`).join("");
+  const render = () => {
+    const flow = F[f], s = flow.steps[i];
+    picker.querySelectorAll("button").forEach((b, k) => b.setAttribute("aria-pressed", k === f));
+    $("flow-title").textContent = flow.title;
+    $("count").textContent = `Flow ${f + 1} of ${F.length}, step ${i + 1} of ${flow.steps.length}`;
+    $("actor").innerHTML = s.who[0] + s.who[1];
+    $("step-title").textContent = s.t;
+    $("step-why").textContent = s.why;
+    $("example").hidden = !s.ex;
+    $("dev-label").textContent = s.dev;
+    $("dev").innerHTML = s.html;
+    $("dots").innerHTML = flow.steps.map((_, k) => `<button type="button" data-k="${k}"${k === i ? ' aria-current="step"' : ""} aria-label="Step ${k + 1}">${k + 1}</button>`).join("");
+    $("prev").disabled = f === 0 && i === 0;
+    $("next").textContent = i < flow.steps.length - 1 ? "Next" : f < F.length - 1 ? "Next flow" : "Start over";
+    history.replaceState(null, "", `#${f + 1}-${i + 1}`);
+  };
+  const go = (nf, ni) => { f = nf; i = ni; render(); };
+  const next = () => (i < F[f].steps.length - 1 ? go(f, i + 1) : go((f + 1) % F.length, 0));
+  const prev = () => (i > 0 ? go(f, i - 1) : f > 0 ? go(f - 1, F[f - 1].steps.length - 1) : null);
+  picker.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) go(+b.dataset.f, 0); });
+  $("dots").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) go(f, +b.dataset.k); });
+  $("next").addEventListener("click", next);
+  $("prev").addEventListener("click", prev);
+  addEventListener("keydown", (e) => { if (e.key === "ArrowRight") next(); if (e.key === "ArrowLeft") prev(); });
+  const read = () => {
+    const m = location.hash.match(/^#(\d+)(?:-(\d+))?$/);
+    if (!m) return render();
+    const nf = Math.min(F.length, Math.max(1, +m[1])) - 1;
+    go(nf, Math.min(F[nf].steps.length, Math.max(1, +(m[2] || 1))) - 1);
+  };
+  addEventListener("hashchange", read);
+  read();
+})();
+</script>
+</body>
+</html>

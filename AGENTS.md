@@ -37,6 +37,7 @@ Board title: *"To help regulate mental health of old people (Voice Agent)"*. Cha
 | [`docs/features/02-pill-checker.md`](docs/features/02-pill-checker.md) | Feature 2 — Pill Checker |
 | [`docs/features/03-live-location.md`](docs/features/03-live-location.md) | Feature 3 — Live Location + Emergency Alert |
 | [`docs/features/04-qa-setup.md`](docs/features/04-qa-setup.md) | Feature 4 — QA / Setup |
+| [`docs/specs/`](docs/specs/README.md) | One spec per core feature: requirements, flows, pitch scenarios |
 
 ## Technical
 
